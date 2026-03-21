@@ -1,6 +1,6 @@
 'use client';
 
-import { Hammer } from 'lucide-react';
+import { Clapperboard } from 'lucide-react';
 
 interface TopBarProps {
   status: string;
@@ -18,8 +18,8 @@ export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
   return (
     <div className="h-12 bg-[hsl(230,40%,8%)] border-b border-[hsl(230,20%,15%)] flex items-center px-5 gap-4">
       <div className="flex items-center gap-2 text-[hsl(var(--primary))] font-bold text-sm">
-        <Hammer className="w-4 h-4" />
-        Forge Studio
+        <Clapperboard className="w-4 h-4" />
+        DramaLab
       </div>
       <div className="flex gap-1 ml-6">
         {plugins.map((p) => (

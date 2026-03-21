@@ -1,4 +1,4 @@
-"""CLI entry point for Forge Studio."""
+"""CLI entry point for DramaLab Studio."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from pathlib import Path
 
 import typer
 
-app = typer.Typer(name="forge-studio", help="Web UI for creative-writing optimization tools.")
+app = typer.Typer(name="dramalab", help="DramaLab — LLM-driven creative writing optimization platform.")
 
 
 @app.command()
@@ -18,11 +18,11 @@ def start(
     api_port: int = typer.Option(8000, "--api-port", help="Backend API port"),
     no_browser: bool = typer.Option(False, "--no-browser", help="Don't open browser"),
 ) -> None:
-    """Start Forge Studio (backend + frontend)."""
+    """Start DramaLab Studio (backend + frontend)."""
     import uvicorn
     from forge_studio.server import create_app
 
-    typer.echo(f"Starting Forge Studio...")
+    typer.echo(f"Starting DramaLab Studio...")
     typer.echo(f"  API: http://localhost:{api_port}")
     typer.echo(f"  UI:  http://localhost:{port}")
 

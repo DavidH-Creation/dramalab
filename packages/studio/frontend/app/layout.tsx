@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Forge Studio',
-  description: 'Web UI for creative-writing optimization tools',
+  title: 'DramaLab',
+  description: 'LLM-driven creative writing optimization platform',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

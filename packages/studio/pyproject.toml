@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "forge-studio"
+name = "dramalab-studio"
 version = "0.1.0"
-description = "Web UI for creative-writing optimization tools"
+description = "DramaLab Studio — Web UI for creative writing optimization"
 license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-forge-studio = "forge_studio.cli:app"
+dramalab = "forge_studio.cli:app"
 
 [project.optional-dependencies]
 dev = [

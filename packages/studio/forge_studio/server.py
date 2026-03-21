@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Forge Studio", version="0.1.0")
+    app = FastAPI(title="DramaLab", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000"],

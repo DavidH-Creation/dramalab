@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dramalab"
+version = "0.1.0"
+description = "DramaLab — LLM-driven creative writing optimization platform"
+license = "MIT"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["packages/script-forge/tests", "packages/studio/tests"]
+asyncio_mode = "strict"
