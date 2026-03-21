@@ -15,11 +15,14 @@ dependencies = [
     "python-docx>=1.0",
     "typer>=0.9",
     "sse-starlette>=2.0",
-    "script-forge>=0.1.0",
+    "scriptsmith>=0.1.0",
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["dramalab_studio"]
+
 [project.scripts]
-dramalab = "forge_studio.cli:app"
+dramalab = "dramalab_studio.cli:app"
 
 [project.optional-dependencies]
 dev = [

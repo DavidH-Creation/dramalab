@@ -2,7 +2,7 @@ import pytest
 import asyncio
 import json
 from unittest.mock import patch, MagicMock
-from forge_studio.plugins.script_forge_plugin import ScriptForgePlugin
+from dramalab_studio.plugins.script_forge_plugin import ScriptForgePlugin
 
 pytestmark = pytest.mark.asyncio
 
@@ -14,9 +14,9 @@ def plugin(tmp_path):
 
 async def test_initialize_creates_workspace(plugin, tmp_path):
     """initialize() should create workspace with sequences."""
-    with patch("script_forge.splitter.split_screenplay") as mock_split, \
-         patch("script_forge.git_ops.git_init"), \
-         patch("script_forge.deriver.derive_all"):
+    with patch("scriptsmith.splitter.split_screenplay") as mock_split, \
+         patch("scriptsmith.git_ops.git_init"), \
+         patch("scriptsmith.deriver.derive_all"):
         mock_split.return_value = [
             MagicMock(id="seq_01", title="Ep 1", char_count=5000, scene_count=3, to_dict=lambda: {"id": "seq_01"})
         ]

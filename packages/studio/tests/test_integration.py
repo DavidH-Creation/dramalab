@@ -6,8 +6,8 @@ import pytest
 import pytest_asyncio
 from unittest.mock import patch, MagicMock
 from httpx import AsyncClient, ASGITransport
-from forge_studio.server import create_app
-from forge_studio.plugin_protocol import RoundResult
+from dramalab_studio.server import create_app
+from dramalab_studio.plugin_protocol import RoundResult
 
 pytestmark = pytest.mark.asyncio
 
@@ -41,10 +41,10 @@ async def test_full_flow(client, tmp_path):
     text = resp.json()["text"]
 
     # Init plugin (with mocked backend to avoid needing Claude CLI)
-    with patch("script_forge.backends.claude_cli.ClaudeCLIBackend") as MockBackend, \
-         patch("script_forge.splitter.split_screenplay") as mock_split, \
-         patch("script_forge.deriver.derive_all"), \
-         patch("script_forge.git_ops.git_init"):
+    with patch("scriptsmith.backends.claude_cli.ClaudeCLIBackend") as MockBackend, \
+         patch("scriptsmith.splitter.split_screenplay") as mock_split, \
+         patch("scriptsmith.deriver.derive_all"), \
+         patch("scriptsmith.git_ops.git_init"):
 
         mock_split.return_value = [MagicMock(
             id="seq_01", filename="seq_01.md", title="Ep 1",

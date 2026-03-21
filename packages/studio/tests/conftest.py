@@ -1,7 +1,7 @@
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
-from forge_studio.server import create_app
+from dramalab_studio.server import create_app
 
 @pytest.fixture
 def app():

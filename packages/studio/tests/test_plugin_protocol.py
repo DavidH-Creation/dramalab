@@ -1,4 +1,4 @@
-from forge_studio.plugin_protocol import RoundResult
+from dramalab_studio.plugin_protocol import RoundResult
 
 
 def test_round_result_to_dict():

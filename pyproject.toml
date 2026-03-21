@@ -10,5 +10,6 @@ license = "MIT"
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
-testpaths = ["packages/script-forge/tests", "packages/studio/tests"]
+testpaths = ["packages/scriptsmith/tests", "packages/studio/tests"]
 asyncio_mode = "strict"
+consider_namespace_packages = true

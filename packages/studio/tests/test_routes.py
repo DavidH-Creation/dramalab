@@ -12,7 +12,7 @@ async def test_plugin_init(client):
         "sequences": [{"id": "seq_01"}],
     })
 
-    with patch("forge_studio.routes.plugins.get_plugin", return_value=mock_plugin):
+    with patch("dramalab_studio.routes.plugins.get_plugin", return_value=mock_plugin):
         resp = await client.post(
             "/api/plugins/script-forge/init",
             json={"input_text": "test", "criteria_text": "criteria", "config": {"model": "sonnet"}},
@@ -30,8 +30,8 @@ async def test_plugin_stop(client):
     mock_plugin = MagicMock()
     mock_plugin.stop = AsyncMock()
 
-    with patch("forge_studio.routes.plugins.get_plugin", return_value=mock_plugin), \
-         patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins.get_plugin", return_value=mock_plugin), \
+         patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.post("/api/plugins/script-forge/abc/stop")
     assert resp.status_code == 200
 
@@ -40,7 +40,7 @@ async def test_plugin_run_sse(client):
     mock_plugin = MagicMock()
 
     async def mock_run(config):
-        from forge_studio.plugin_protocol import RoundResult
+        from dramalab_studio.plugin_protocol import RoundResult
         yield RoundResult(
             round_number=1, status="keep", total_before=70, total_after=74,
             delta=4, target_dimension="对白", description="test",
@@ -50,7 +50,7 @@ async def test_plugin_run_sse(client):
     mock_plugin.run = mock_run
     mock_plugin._worker = None
 
-    with patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.post("/api/plugins/script-forge/abc/run")
     assert resp.status_code == 200
     assert "text/event-stream" in resp.headers["content-type"]
@@ -62,7 +62,7 @@ async def test_plugin_text(client):
     mock_plugin = MagicMock()
     mock_plugin.get_current_text = AsyncMock(return_value="optimized text")
 
-    with patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.get("/api/plugins/script-forge/abc/text")
     assert resp.status_code == 200
     assert resp.json()["text"] == "optimized text"
@@ -72,7 +72,7 @@ async def test_plugin_export(client):
     mock_plugin = MagicMock()
     mock_plugin.export = AsyncMock(return_value=b"PK\x03\x04fake-docx")
 
-    with patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.get("/api/plugins/script-forge/abc/export")
     assert resp.status_code == 200
     assert resp.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"

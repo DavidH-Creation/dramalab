@@ -1,5 +1,5 @@
 from typer.testing import CliRunner
-from forge_studio.cli import app
+from dramalab_studio.cli import app
 
 runner = CliRunner()
 
