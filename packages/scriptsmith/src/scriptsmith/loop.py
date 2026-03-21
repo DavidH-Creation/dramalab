@@ -34,6 +34,23 @@ logger = logging.getLogger(__name__)
 console = Console()
 
 
+# Re-derive context every N keeps on the same segment to propagate
+# cross-segment changes (character deaths, new relationships, etc.)
+# without calling Claude on every single keep.
+_KEEPS_BEFORE_RE_DERIVE = 3
+
+
+def _re_derive_context(workspace: Path, backend: BackendProtocol) -> None:
+    """Re-derive synopsis/context with error handling."""
+    console.print("  [cyan]Re-deriving context for cross-segment consistency...[/cyan]")
+    try:
+        derive_all(workspace, backend)
+        console.print("  [cyan]Context updated.[/cyan]")
+    except Exception as e:
+        logger.warning("Context re-derive failed: %s", e)
+        console.print(f"  [yellow]Context re-derive failed: {e} (continuing with stale context)[/yellow]")
+
+
 def should_stop(state: ProjectState, max_rounds: int | None, stall_limit: int) -> bool:
     """Determine if the loop should stop."""
     if state.auto_phase == "done":
@@ -201,6 +218,15 @@ def _run_micro_round(
         state.stall_count = 0
         state.total_keeps += 1
         console.print(f"  [green]KEEP (+{delta}) [{short_hash}][/green]")
+
+        # Periodic re-derive: after every N keeps on same segment,
+        # update context so cross-segment info stays current
+        seq_keeps = sum(
+            1 for r in load_history(workspace)
+            if r.sequence == seq_id and r.status == "keep"
+        ) + 1  # +1 for current (not yet in history)
+        if seq_keeps % _KEEPS_BEFORE_RE_DERIVE == 0:
+            _re_derive_context(workspace, backend)
     else:
         discard_candidate(workspace, seq_id)
         state.stall_count += 1
@@ -216,11 +242,17 @@ def _run_micro_round(
         state.sequences_completed.append(seq_id)
         state.stall_count = 0
         # Find next uncompleted sequence
+        next_seq = None
         for seq in sequences:
             if seq.id not in state.sequences_completed:
-                state.current_sequence = seq.id
-                console.print(f"  [yellow]Stalled on {seq_id}, moving to {seq.id}[/yellow]")
+                next_seq = seq
                 break
+        if next_seq is not None:
+            state.current_sequence = next_seq.id
+            console.print(f"  [yellow]Stalled on {seq_id}, moving to {next_seq.id}[/yellow]")
+            # Re-derive context so the next segment sees all changes
+            # from the current segment (character deaths, relationships, etc.)
+            _re_derive_context(workspace, backend)
 
     return record
 
@@ -235,9 +267,9 @@ def _run_macro_round(
     """Execute one macro round."""
     console.print(f"\n[bold]Round {state.round_number + 1} (macro)[/bold]")
 
-    # Regenerate derived files
+    # Regenerate derived files (skip if background init just produced them)
     console.print("  Regenerating synopsis/context...")
-    derive_all(workspace, backend)
+    derive_all(workspace, backend, skip_if_fresh=True)
 
     synopsis_path = workspace / "derived" / "synopsis.md"
     context_path = workspace / "derived" / "context.md"

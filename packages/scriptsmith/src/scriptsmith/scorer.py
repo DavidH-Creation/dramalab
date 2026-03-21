@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Literal
 
 from scriptsmith.backends import BackendProtocol
@@ -32,10 +33,10 @@ def score(
     )
 
     raw_runs: list[dict] = []
-    for _ in range(runs):
-        result = backend.query_json(prompt)
-        # Strip internal keys for scoring, but keep in raw_runs
-        raw_runs.append(result)
+    with ThreadPoolExecutor(max_workers=runs) as pool:
+        futures = [pool.submit(backend.query_json, prompt) for _ in range(runs)]
+        for future in as_completed(futures):
+            raw_runs.append(future.result())
 
     # Auto-detect max_total from first run if not specified
     if max_total is None:

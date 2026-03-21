@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 from pathlib import Path
 
 from scriptsmith.models import ExperimentRecord, ProjectState
 from scriptsmith.workspace import atomic_write
+
+_history_lock = threading.Lock()
 
 
 def save_state(workspace: Path, state: ProjectState) -> None:
@@ -31,8 +34,9 @@ def append_history(workspace: Path, record: ExperimentRecord) -> None:
     path = workspace / ".scriptsmith" / "history.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     line = json.dumps(record.to_dict(), ensure_ascii=False) + "\n"
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(line)
+    with _history_lock:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(line)
 
 
 def load_history(workspace: Path) -> list[ExperimentRecord]:

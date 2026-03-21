@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import logging
+import threading
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -10,10 +12,13 @@ from pydantic import BaseModel
 from dramalab_studio.plugins import get_plugin
 from dramalab_studio.sse import EventSourceResponse
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 # In-memory session tracking (v1 single-user)
 _sessions: dict[str, object] = {}  # session_id -> plugin instance
+_sessions_lock = threading.Lock()
 
 
 class InitRequest(BaseModel):
@@ -28,14 +33,21 @@ async def plugin_init(name: str, req: InitRequest):
     if plugin is None:
         raise HTTPException(404, f"Plugin '{name}' not found")
 
-    # Check for existing active session
-    for sid, p in _sessions.items():
-        if getattr(p, 'name', '') == name and getattr(p, '_worker', None) and p._worker.is_alive():
-            raise HTTPException(409, "A session is already running")
+    if not req.input_text.strip():
+        raise HTTPException(422, "input_text must not be empty")
+    if not req.criteria_text.strip():
+        raise HTTPException(422, "criteria_text must not be empty")
+
+    # Check for existing active session (thread-safe)
+    with _sessions_lock:
+        for sid, p in _sessions.items():
+            if getattr(p, 'name', '') == name and getattr(p, '_worker', None) and p._worker.is_alive():
+                raise HTTPException(409, "A session is already running")
 
     result = await plugin.initialize(req.input_text, req.criteria_text, req.config)
     session_id = result["session_id"]
-    _sessions[session_id] = plugin
+    with _sessions_lock:
+        _sessions[session_id] = plugin
     return result
 
 
@@ -137,7 +149,8 @@ async def plugin_stream(name: str, session_id: str):
 
 @router.delete("/plugins/{name}/{session_id}")
 async def plugin_delete(name: str, session_id: str):
-    plugin = _sessions.pop(session_id, None)
+    with _sessions_lock:
+        plugin = _sessions.pop(session_id, None)
     if plugin is None:
         raise HTTPException(404, f"Session '{session_id}' not found")
     if hasattr(plugin, '_workspace') and plugin._workspace:

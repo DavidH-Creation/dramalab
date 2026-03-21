@@ -3,13 +3,19 @@
 
 from __future__ import annotations
 
+import locale
 import shutil
 import subprocess
+import sys
 
 from scriptsmith.backends import BackendError, extract_json
 
 # Windows command line limit is ~8191 chars. Keep safe margin.
 _MAX_ARG_BYTES = 7000
+
+# On Windows, .CMD wrappers often output in the system's legacy encoding
+# (e.g., GBK/cp936 for Chinese Windows) rather than UTF-8.
+_FALLBACK_ENCODING = locale.getpreferredencoding(False) if sys.platform == "win32" else "utf-8"
 
 
 def _find_claude() -> str:
@@ -43,24 +49,24 @@ class ClaudeCLIBackend:
         claude = self._get_claude_path()
 
         prompt_bytes = prompt.encode("utf-8")
-        if len(prompt_bytes) < _MAX_ARG_BYTES:
-            cmd = [claude, "-p", prompt, "--model", self.model, "--no-input",
-                   "--reasoning-effort", self.reasoning_effort]
-            stdin_input = None
-        else:
-            # Pipe long prompts via stdin (claude -p reads from stdin when given no positional arg)
-            cmd = [claude, "-p", "-", "--model", self.model, "--no-input",
-                   "--reasoning-effort", self.reasoning_effort]
+        # On Windows, non-ASCII chars in CLI args can get mangled by .CMD wrappers.
+        # Always use stdin for prompts with non-ASCII or long prompts.
+        use_stdin = len(prompt_bytes) >= _MAX_ARG_BYTES or not prompt.isascii()
+        if use_stdin:
+            cmd = [claude, "-p", "--model", self.model,
+                   "--effort", self.reasoning_effort]
             stdin_input = prompt
+        else:
+            cmd = [claude, "-p", prompt, "--model", self.model,
+                   "--effort", self.reasoning_effort]
+            stdin_input = None
 
         try:
             result = subprocess.run(
                 cmd,
                 capture_output=True,
-                text=True,
-                encoding="utf-8",
                 timeout=t,
-                input=stdin_input,
+                input=stdin_input.encode("utf-8") if stdin_input else None,
             )
         except FileNotFoundError:
             raise BackendError(
@@ -70,9 +76,17 @@ class ClaudeCLIBackend:
             raise BackendError(f"Claude CLI timed out after {t}s")
 
         if result.returncode != 0:
-            raise BackendError(f"Claude CLI failed (exit {result.returncode}): {result.stderr[:500]}")
+            stderr = result.stderr.decode("utf-8", errors="replace") if isinstance(result.stderr, bytes) else result.stderr
+            raise BackendError(f"Claude CLI failed (exit {result.returncode}): {stderr[:500]}")
 
-        return result.stdout
+        # Decode stdout: try UTF-8 first, fall back to system encoding (GBK on Chinese Windows)
+        raw = result.stdout
+        if isinstance(raw, str):
+            return raw  # Already decoded (e.g., in tests or non-Windows)
+        try:
+            return raw.decode("utf-8")
+        except UnicodeDecodeError:
+            return raw.decode(_FALLBACK_ENCODING, errors="replace")
 
     def query_json(self, prompt: str, *, timeout: int | None = None, retries: int = 2) -> dict:
         """Send prompt, parse JSON from response. Retry on parse failure."""

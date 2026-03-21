@@ -29,7 +29,7 @@ export function ResultsPanel({
   status,
 }: ResultsPanelProps) {
   const lastKeep = [...rounds].reverse().find((round) => round.status === 'keep');
-  const currentScore = lastKeep ? lastKeep.total_after : (rounds[0]?.total_before ?? 0);
+  const currentScore = lastKeep?.total_after != null ? lastKeep.total_after : (rounds[0]?.total_before ?? 0);
   const firstScore = rounds[0]?.total_before ?? 0;
   const improvement = currentScore - firstScore;
   const selectedResult = selectedRound !== null ? rounds[selectedRound] : null;

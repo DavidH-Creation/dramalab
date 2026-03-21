@@ -182,11 +182,13 @@ class TestClaudeCLIBackend:
             backend.query(long_prompt)
 
         call_args = mock_run.call_args
-        # Long prompts must be passed via input= kwarg, not as CLI argument
-        assert call_args[1].get("input") == long_prompt
+        # Long prompts must be passed via input= kwarg (as bytes in binary mode)
+        stdin_input = call_args[1].get("input")
+        expected = long_prompt.encode("utf-8") if isinstance(stdin_input, bytes) else long_prompt
+        assert stdin_input == expected
 
     def test_reasoning_effort_in_command(self):
-        """reasoning_effort should appear as --reasoning-effort flag."""
+        """reasoning_effort should appear as --effort flag."""
         with patch("scriptsmith.backends.claude_cli.shutil.which", return_value="/usr/bin/claude"):
             backend = ClaudeCLIBackend(model="sonnet", timeout=60, reasoning_effort="high")
 
@@ -195,8 +197,8 @@ class TestClaudeCLIBackend:
             backend.query("test prompt")
 
         cmd = mock_run.call_args[0][0]
-        assert "--reasoning-effort" in cmd
-        idx = cmd.index("--reasoning-effort")
+        assert "--effort" in cmd
+        idx = cmd.index("--effort")
         assert cmd[idx + 1] == "high"
 
     def test_reasoning_effort_default_medium(self):
@@ -209,6 +211,6 @@ class TestClaudeCLIBackend:
             backend.query("test prompt")
 
         cmd = mock_run.call_args[0][0]
-        assert "--reasoning-effort" in cmd
-        idx = cmd.index("--reasoning-effort")
+        assert "--effort" in cmd
+        idx = cmd.index("--effort")
         assert cmd[idx + 1] == "medium"

@@ -30,7 +30,7 @@ class ScoreResult:
         scores: dict[str, int] = {}
         for dim in dimensions:
             values = [r[dim] for r in runs if dim in r]
-            scores[dim] = int(median(values))
+            scores[dim] = int(median(values)) if values else 0
 
         total = sum(scores.values())
         breakdown = ",".join(str(scores[d]) for d in dimensions)

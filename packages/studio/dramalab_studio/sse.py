@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from typing import AsyncIterator
 
 from starlette.responses import StreamingResponse
+
+logger = logging.getLogger(__name__)
 
 
 class EventSourceResponse(StreamingResponse):
@@ -28,7 +31,13 @@ class EventSourceResponse(StreamingResponse):
     async def _wrap(generator: AsyncIterator):
         try:
             async for event_type, data in generator:
-                payload = json.dumps(data, ensure_ascii=False) if isinstance(data, dict) else str(data)
+                try:
+                    payload = json.dumps(data, ensure_ascii=False) if isinstance(data, dict) else str(data)
+                except (TypeError, ValueError) as exc:
+                    logger.error("JSON serialization failed for event '%s': %s", event_type, exc)
+                    payload = json.dumps({"error": f"Serialization error: {exc}"})
                 yield f"event: {event_type}\ndata: {payload}\n\n"
         except asyncio.CancelledError:
             pass
+        except Exception:
+            logger.exception("Unexpected error in SSE stream")

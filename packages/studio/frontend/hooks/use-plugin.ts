@@ -106,11 +106,25 @@ export function usePlugin(pluginName: string = 'scriptsmith') {
       dispatch({ type: 'SET_SESSION', sessionId: result.session_id });
       dispatch({ type: 'SET_STATUS', status: 'running' });
 
-      streamUrlRef.current = getStreamUrl(pluginName, result.session_id);
-      setTimeout(() => connect(), 0);
+      const streamUrl = getStreamUrl(pluginName, result.session_id);
+      streamUrlRef.current = streamUrl;
+      // Pass config to the run endpoint so the loop knows rounds/mode/etc.
+      const runConfig = {
+        model: state.config.model,
+        rounds: state.config.rounds,
+        reasoning_effort: state.config.reasoning_effort,
+        mode: state.config.mode,
+        keep_threshold: state.config.keep_threshold,
+      };
+      setTimeout(() => connect(streamUrl, runConfig), 0);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      dispatch({ type: 'ERROR', message });
+      const message =
+        err instanceof Error
+          ? err.message.includes('fetch')
+            ? `Connection failed: unable to reach the backend server. ${err.message}`
+            : err.message
+          : String(err);
+      dispatch({ type: 'ERROR', message: message || 'An unexpected error occurred while starting the plugin.' });
     }
   }, [state.inputText, state.criteriaText, state.config, pluginName, connect]);
 

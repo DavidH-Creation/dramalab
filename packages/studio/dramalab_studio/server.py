@@ -1,13 +1,18 @@
 """FastAPI application factory."""
 
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
 def create_app() -> FastAPI:
     app = FastAPI(title="DramaLab", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000"],
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -24,3 +29,6 @@ def create_app() -> FastAPI:
     register_plugin(ScriptSmithPlugin())
 
     return app
+
+
+app = create_app()
