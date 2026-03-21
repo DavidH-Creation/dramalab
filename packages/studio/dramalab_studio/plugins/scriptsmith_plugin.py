@@ -1,9 +1,8 @@
-"""Script-Forge plugin adapter for DramaLab Studio."""
+"""ScriptSmith plugin adapter for DramaLab Studio."""
 
 from __future__ import annotations
 
 import asyncio
-import json
 import queue
 import tempfile
 import threading
@@ -11,14 +10,14 @@ import uuid
 from pathlib import Path
 from typing import AsyncIterator
 
-from dramalab_studio.plugin_protocol import DramaLabPlugin, RoundResult
+from dramalab_studio.plugin_protocol import RoundResult
 
 
-class ScriptForgePlugin:
-    """Wraps the script-forge package as a DramaLab Studio plugin."""
+class ScriptSmithPlugin:
+    """Wrap the scriptsmith package as a DramaLab Studio plugin."""
 
-    name = "script-forge"
-    display_name = "剧本优化"
+    name = "scriptsmith"
+    display_name = "ScriptSmith"
 
     def __init__(self, workdir: Path | None = None) -> None:
         self._workdir = workdir or Path(tempfile.gettempdir()) / "dramalab-studio"
@@ -30,7 +29,7 @@ class ScriptForgePlugin:
         self._queue: queue.Queue | None = None
 
     async def initialize(self, input_text: str, criteria_text: str, config: dict) -> dict:
-        """Create workspace, split screenplay, derive files."""
+        """Create workspace, split screenplay, and derive context."""
         from docx import Document as DocxDocument
         from scriptsmith.git_ops import git_init
         from scriptsmith.splitter import split_screenplay
@@ -40,10 +39,9 @@ class ScriptForgePlugin:
         ws = self._workdir / session_id
         ws.mkdir(parents=True, exist_ok=True)
 
-        for d in ["input", "sequences", "derived", "experiments", "exports", ".script-forge"]:
-            (ws / d).mkdir(exist_ok=True)
+        for directory in ["input", "sequences", "derived", "experiments", "exports", ".scriptsmith"]:
+            (ws / directory).mkdir(exist_ok=True)
 
-        # Write input as real .docx
         doc = DocxDocument()
         for line in input_text.split("\n"):
             if line.strip():
@@ -51,10 +49,8 @@ class ScriptForgePlugin:
         docx_path = ws / "input" / "screenplay.docx"
         doc.save(str(docx_path))
 
-        # Write criteria
         atomic_write(ws / "criteria.md", criteria_text)
 
-        # Write project config
         model = config.get("model", "sonnet")
         config_content = f"""[project]
 name = "dramalab-studio-session"
@@ -75,12 +71,12 @@ stall_limit = 5
 target_chars_min = 8000
 target_chars_max = 15000
 """
-        atomic_write(ws / ".script-forge" / "project.toml", config_content)
-        atomic_write(ws / ".gitignore", ".script-forge/.lock\n.script-forge/*.tmp\n")
+        atomic_write(ws / ".scriptsmith" / "project.toml", config_content)
+        atomic_write(ws / ".gitignore", ".scriptsmith/.lock\n.scriptsmith/*.tmp\n")
 
-        # Split screenplay
         try:
             from scriptsmith.backends.claude_cli import ClaudeCLIBackend
+
             backend = ClaudeCLIBackend(
                 model=model,
                 reasoning_effort=config.get("reasoning_effort", "medium"),
@@ -90,15 +86,14 @@ target_chars_max = 15000
 
         infos = split_screenplay(docx_path, ws, backend=backend)
 
-        # Derive
         if backend is not None:
             try:
                 from scriptsmith.deriver import derive_all
+
                 derive_all(ws, backend)
             except Exception:
                 pass
 
-        # Git init
         git_init(ws)
 
         self._workspace = ws
@@ -110,7 +105,7 @@ target_chars_max = 15000
         }
 
     async def run(self, config: dict) -> AsyncIterator[RoundResult]:
-        """Run the optimization loop in a background thread, yield results."""
+        """Run the optimization loop in a background thread and stream rounds."""
         if self._workspace is None:
             raise RuntimeError("Plugin not initialized. Call initialize() first.")
 
@@ -119,7 +114,6 @@ target_chars_max = 15000
         from scriptsmith.state import acquire_lock, release_lock
 
         ws = self._workspace
-
         acquire_lock(ws)
 
         self._stop_event = threading.Event()
@@ -147,16 +141,15 @@ target_chars_max = 15000
                     on_round=on_round,
                     stop_event=self._stop_event,
                 )
-            except Exception as e:
-                self._queue.put(e)
+            except Exception as exc:
+                self._queue.put(exc)
             finally:
                 release_lock(ws)
-                self._queue.put(None)  # Sentinel
+                self._queue.put(None)
 
         self._worker = threading.Thread(target=worker, daemon=True)
         self._worker.start()
 
-        # Async bridge: poll queue
         loop = asyncio.get_running_loop()
         while True:
             item = await loop.run_in_executor(None, self._queue.get)
@@ -167,29 +160,33 @@ target_chars_max = 15000
             yield item
 
     async def stop(self) -> None:
-        """Signal the loop to stop after current round."""
+        """Signal the loop to stop after the current round."""
         if self._stop_event is not None:
             self._stop_event.set()
 
     async def get_current_text(self) -> str:
-        """Read and concatenate all sequences."""
+        """Read and concatenate all current sequences."""
         if self._workspace is None:
             return ""
+
         from scriptsmith.workspace import load_manifest
+
         sequences = load_manifest(self._workspace)
         parts = []
-        for seq in sequences:
-            path = self._workspace / "sequences" / seq.filename
+        for sequence in sequences:
+            path = self._workspace / "sequences" / sequence.filename
             if path.exists():
                 parts.append(path.read_text(encoding="utf-8"))
         return "\n\n---\n\n".join(parts)
 
     async def export(self) -> bytes:
-        """Export to docx and return bytes."""
+        """Export the current workspace to a docx document."""
         if self._workspace is None:
             raise RuntimeError("No workspace")
+
         from scriptsmith.exporter import export_to_docx
-        out = self._workspace / "exports" / "improved.docx"
-        out.parent.mkdir(exist_ok=True)
-        export_to_docx(self._workspace, out)
-        return out.read_bytes()
+
+        output_path = self._workspace / "exports" / "improved.docx"
+        output_path.parent.mkdir(exist_ok=True)
+        export_to_docx(self._workspace, output_path)
+        return output_path.read_bytes()

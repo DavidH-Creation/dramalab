@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-import subprocess
-import sys
 import webbrowser
-from pathlib import Path
 
 import typer
 
-app = typer.Typer(name="dramalab", help="DramaLab — LLM-driven creative writing optimization platform.")
+app = typer.Typer(name="dramalab", help="DramaLab - LLM-driven creative writing optimization platform.")
 
 
 @app.command()
@@ -22,7 +19,7 @@ def start(
     import uvicorn
     from dramalab_studio.server import create_app
 
-    typer.echo(f"Starting DramaLab Studio...")
+    typer.echo("Starting DramaLab Studio...")
     typer.echo(f"  API: http://localhost:{api_port}")
     typer.echo(f"  UI:  http://localhost:{port}")
 

@@ -19,7 +19,7 @@
 3. **选择工作模式**：
    - `macro` — 宏观模式，修改 `synopsis.md`（结构、节奏、角色弧光）
    - `micro` — 微观模式，逐段修改 `sequences/` 中的具体剧本
-4. **创建工作分支**：`git checkout -b scriptforge/<tag>` 从 main 分支。
+4. **创建工作分支**：`git checkout -b scriptsmith/<tag>` 从 main 分支。
 5. **初始化 results.tsv**：只写表头。
 6. **基线评分**：对当前版本跑一次完整评分，记录到 results.tsv。
 

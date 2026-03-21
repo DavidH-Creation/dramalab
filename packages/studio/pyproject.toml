@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "dramalab-studio"
 version = "0.1.0"
-description = "DramaLab Studio — Web UI for creative writing optimization"
+description = "DramaLab Studio - Web UI for creative writing optimization"
 license = "MIT"
 requires-python = ">=3.11"
 dependencies = [

@@ -10,9 +10,13 @@ interface ScoreCardsProps {
 export function ScoreCards({ currentScore, totalImprovement, currentRound, maxRounds }: ScoreCardsProps) {
   return (
     <div className="grid grid-cols-3 gap-2.5 mb-4">
-      <Card value={currentScore} label="当前总分" color="text-[hsl(var(--primary))]" />
-      <Card value={totalImprovement > 0 ? `+${totalImprovement}` : String(totalImprovement)} label="累计提升" color="text-yellow-400" />
-      <Card value={`${currentRound} / ${maxRounds}`} label="轮次" color="text-[hsl(var(--muted-foreground))]" />
+      <Card value={currentScore} label="Current score" color="text-[hsl(var(--primary))]" />
+      <Card
+        value={totalImprovement > 0 ? `+${totalImprovement}` : String(totalImprovement)}
+        label="Total gain"
+        color="text-yellow-400"
+      />
+      <Card value={`${currentRound} / ${maxRounds}`} label="Rounds" color="text-[hsl(var(--muted-foreground))]" />
     </div>
   );
 }

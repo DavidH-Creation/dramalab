@@ -1,10 +1,10 @@
-# Forge Studio Implementation Plan
+﻿# DramaLab Studio Implementation Plan
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a web UI (Forge Studio) that wraps the existing scriptsmith CLI into a 3-column browser app with real-time round-by-round results.
+**Goal:** Build a web UI (DramaLab Studio) that wraps the existing scriptsmith CLI into a 3-column browser app with real-time round-by-round results.
 
-**Architecture:** Next.js 14 frontend talks to a FastAPI backend via REST + SSE. The backend hosts a plugin system; the v1 plugin wraps the existing `scriptsmith` Python package. The project lives in a new `forge-studio/` directory alongside (not inside) `scriptsmith/`.
+**Architecture:** Next.js 14 frontend talks to a FastAPI backend via REST + SSE. The backend hosts a plugin system; the v1 plugin wraps the existing `scriptsmith` Python package. The project lives in a new `dramalab-studio/` directory alongside (not inside) `scriptsmith/`.
 
 **Tech Stack:** Python 3.11+ / FastAPI / uvicorn / scriptsmith (local dep) | Next.js 14 / TypeScript / Tailwind CSS / shadcn/ui / Recharts
 
@@ -12,79 +12,79 @@
 
 ## File Structure
 
-### Backend (`forge-studio/`)
+### Backend (`dramalab-studio/`)
 
 ```
-forge-studio/
-├── pyproject.toml
-├── forge_studio/
-│   ├── __init__.py
-│   ├── cli.py                    # Typer CLI: `forge-studio start`
-│   ├── server.py                 # FastAPI app factory + CORS + static serving
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── upload.py             # POST /api/upload (docx/md parsing)
-│   │   └── plugins.py            # All /api/plugins/{name}/... endpoints
-│   ├── plugin_protocol.py        # ForgePlugin Protocol + RoundResult dataclass
-│   ├── plugins/
-│   │   ├── __init__.py           # Plugin registry
-│   │   └── scriptsmith_plugin.py # Wraps scriptsmith package
-│   └── sse.py                    # SSE helper (EventSourceResponse)
-└── tests/
-    ├── conftest.py
-    ├── test_upload.py
-    ├── test_plugin_protocol.py
-    ├── test_scriptsmith_plugin.py
-    └── test_routes.py
+dramalab-studio/
+鈹溾攢鈹€ pyproject.toml
+鈹溾攢鈹€ dramalab_studio/
+鈹?  鈹溾攢鈹€ __init__.py
+鈹?  鈹溾攢鈹€ cli.py                    # Typer CLI: `dramalab-studio start`
+鈹?  鈹溾攢鈹€ server.py                 # FastAPI app factory + CORS + static serving
+鈹?  鈹溾攢鈹€ routes/
+鈹?  鈹?  鈹溾攢鈹€ __init__.py
+鈹?  鈹?  鈹溾攢鈹€ upload.py             # POST /api/upload (docx/md parsing)
+鈹?  鈹?  鈹斺攢鈹€ plugins.py            # All /api/plugins/{name}/... endpoints
+鈹?  鈹溾攢鈹€ plugin_protocol.py        # DramaLabPlugin Protocol + RoundResult dataclass
+鈹?  鈹溾攢鈹€ plugins/
+鈹?  鈹?  鈹溾攢鈹€ __init__.py           # Plugin registry
+鈹?  鈹?  鈹斺攢鈹€ scriptsmith_plugin.py # Wraps scriptsmith package
+鈹?  鈹斺攢鈹€ sse.py                    # SSE helper (EventSourceResponse)
+鈹斺攢鈹€ tests/
+    鈹溾攢鈹€ conftest.py
+    鈹溾攢鈹€ test_upload.py
+    鈹溾攢鈹€ test_plugin_protocol.py
+    鈹溾攢鈹€ test_scriptsmith_plugin.py
+    鈹斺攢鈹€ test_routes.py
 ```
 
 ### ScriptSmith Core Changes (in existing `scriptsmith/` repo)
 
 ```
 src/scriptsmith/
-├── backends/
-│   └── claude_cli.py             # MODIFY: add reasoning_effort param
-├── loop.py                       # MODIFY: add keep_threshold, on_round, stop_event
+鈹溾攢鈹€ backends/
+鈹?  鈹斺攢鈹€ claude_cli.py             # MODIFY: add reasoning_effort param
+鈹溾攢鈹€ loop.py                       # MODIFY: add keep_threshold, on_round, stop_event
 ```
 
-### Frontend (`forge-studio/frontend/`)
+### Frontend (`dramalab-studio/frontend/`)
 
 ```
 frontend/
-├── package.json
-├── next.config.js
-├── tailwind.config.ts
-├── tsconfig.json
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx
-│   ├── globals.css
-│   └── scriptsmith/
-│       └── page.tsx
-├── components/
-│   ├── top-bar.tsx
-│   ├── input-panel.tsx
-│   ├── config-panel.tsx
-│   ├── results-panel.tsx
-│   ├── score-cards.tsx
-│   ├── trend-chart.tsx
-│   ├── dimension-bars.tsx
-│   ├── round-timeline.tsx
-│   └── file-upload.tsx
-├── hooks/
-│   ├── use-sse.ts
-│   └── use-plugin.ts
-├── lib/
-│   └── api.ts
-└── types/
-    └── index.ts
+鈹溾攢鈹€ package.json
+鈹溾攢鈹€ next.config.js
+鈹溾攢鈹€ tailwind.config.ts
+鈹溾攢鈹€ tsconfig.json
+鈹溾攢鈹€ app/
+鈹?  鈹溾攢鈹€ layout.tsx
+鈹?  鈹溾攢鈹€ page.tsx
+鈹?  鈹溾攢鈹€ globals.css
+鈹?  鈹斺攢鈹€ scriptsmith/
+鈹?      鈹斺攢鈹€ page.tsx
+鈹溾攢鈹€ components/
+鈹?  鈹溾攢鈹€ top-bar.tsx
+鈹?  鈹溾攢鈹€ input-panel.tsx
+鈹?  鈹溾攢鈹€ config-panel.tsx
+鈹?  鈹溾攢鈹€ results-panel.tsx
+鈹?  鈹溾攢鈹€ score-cards.tsx
+鈹?  鈹溾攢鈹€ trend-chart.tsx
+鈹?  鈹溾攢鈹€ dimension-bars.tsx
+鈹?  鈹溾攢鈹€ round-timeline.tsx
+鈹?  鈹斺攢鈹€ file-upload.tsx
+鈹溾攢鈹€ hooks/
+鈹?  鈹溾攢鈹€ use-sse.ts
+鈹?  鈹斺攢鈹€ use-plugin.ts
+鈹溾攢鈹€ lib/
+鈹?  鈹斺攢鈹€ api.ts
+鈹斺攢鈹€ types/
+    鈹斺攢鈹€ index.ts
 ```
 
 ---
 
 ## Chunk 1: Backend (scriptsmith core changes + FastAPI server + plugin)
 
-### Task 1: ScriptSmith Core — Add `reasoning_effort` to ClaudeCLIBackend
+### Task 1: ScriptSmith Core 鈥?Add `reasoning_effort` to ClaudeCLIBackend
 
 **Files:**
 - Modify: `scriptsmith/src/scriptsmith/backends/claude_cli.py`
@@ -170,7 +170,7 @@ git commit -m "feat: add reasoning_effort parameter to ClaudeCLIBackend"
 
 ---
 
-### Task 2: ScriptSmith Core — Add `keep_threshold`, `on_round`, `stop_event` to `run_loop`
+### Task 2: ScriptSmith Core 鈥?Add `keep_threshold`, `on_round`, `stop_event` to `run_loop`
 
 **Files:**
 - Modify: `scriptsmith/src/scriptsmith/loop.py`
@@ -323,30 +323,30 @@ git commit -m "feat: add keep_threshold, on_round callback, stop_event to run_lo
 
 ---
 
-### Task 3: Forge Studio — Project scaffolding
+### Task 3: DramaLab Studio 鈥?Project scaffolding
 
 **Files:**
-- Create: `forge-studio/pyproject.toml`
-- Create: `forge-studio/forge_studio/__init__.py`
-- Create: `forge-studio/.gitignore`
+- Create: `dramalab-studio/pyproject.toml`
+- Create: `dramalab-studio/dramalab_studio/__init__.py`
+- Create: `dramalab-studio/.gitignore`
 
 - [ ] **Step 1: Create project directory and files**
 
 ```bash
-mkdir -p forge-studio/forge_studio
-mkdir -p forge-studio/forge_studio/routes
-mkdir -p forge-studio/forge_studio/plugins
-mkdir -p forge-studio/tests
+mkdir -p dramalab-studio/dramalab_studio
+mkdir -p dramalab-studio/dramalab_studio/routes
+mkdir -p dramalab-studio/dramalab_studio/plugins
+mkdir -p dramalab-studio/tests
 ```
 
-`forge-studio/pyproject.toml`:
+`dramalab-studio/pyproject.toml`:
 ```toml
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "forge-studio"
+name = "dramalab-studio"
 version = "0.1.0"
 description = "Web UI for creative-writing optimization tools"
 license = "MIT"
@@ -362,7 +362,7 @@ dependencies = [
 ]
 
 [project.scripts]
-forge-studio = "forge_studio.cli:app"
+dramalab-studio = "dramalab_studio.cli:app"
 
 [project.optional-dependencies]
 dev = [
@@ -372,12 +372,12 @@ dev = [
 ]
 ```
 
-`forge-studio/forge_studio/__init__.py`:
+`dramalab-studio/dramalab_studio/__init__.py`:
 ```python
 __version__ = "0.1.0"
 ```
 
-`forge-studio/.gitignore`:
+`dramalab-studio/.gitignore`:
 ```
 __pycache__/
 *.pyc
@@ -391,16 +391,16 @@ frontend/.next/
 
 - [ ] **Step 2: Install in dev mode**
 
-Run: `cd forge-studio && pip install -e ".[dev]"`
+Run: `cd dramalab-studio && pip install -e ".[dev]"`
 Expected: Installs successfully
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git init
-git add pyproject.toml forge_studio/__init__.py .gitignore
-git commit -m "init: forge-studio project scaffolding"
+git add pyproject.toml dramalab_studio/__init__.py .gitignore
+git commit -m "init: dramalab-studio project scaffolding"
 ```
 
 ---
@@ -408,14 +408,14 @@ git commit -m "init: forge-studio project scaffolding"
 ### Task 4: Plugin Protocol + RoundResult
 
 **Files:**
-- Create: `forge-studio/forge_studio/plugin_protocol.py`
-- Create: `forge-studio/tests/test_plugin_protocol.py`
+- Create: `dramalab-studio/dramalab_studio/plugin_protocol.py`
+- Create: `dramalab-studio/tests/test_plugin_protocol.py`
 
 - [ ] **Step 1: Write tests**
 
 ```python
 # tests/test_plugin_protocol.py
-from forge_studio.plugin_protocol import RoundResult
+from dramalab_studio.plugin_protocol import RoundResult
 
 def test_round_result_to_dict():
     r = RoundResult(
@@ -424,17 +424,17 @@ def test_round_result_to_dict():
         total_before=70,
         total_after=74,
         delta=4,
-        target_dimension="对白质量",
+        target_dimension="瀵圭櫧璐ㄩ噺",
         description="Improved dialogue",
-        scores_before={"结构": 18, "对白": 14},
-        scores_after={"结构": 18, "对白": 18},
+        scores_before={"缁撴瀯": 18, "瀵圭櫧": 14},
+        scores_after={"缁撴瀯": 18, "瀵圭櫧": 18},
         max_total=100,
     )
     d = r.to_dict()
     assert d["round_number"] == 1
     assert d["status"] == "keep"
-    assert d["scores_before"]["对白"] == 14
-    assert d["scores_after"]["对白"] == 18
+    assert d["scores_before"]["瀵圭櫧"] == 14
+    assert d["scores_after"]["瀵圭櫧"] == 18
 
 def test_round_result_from_experiment_record():
     """RoundResult.from_experiment_record should convert correctly."""
@@ -443,7 +443,7 @@ def test_round_result_from_experiment_record():
     record.id = 1
     record.sequence = "seq_01"
     record.mode = "micro"
-    record.target_dimension = "对白"
+    record.target_dimension = "瀵圭櫧"
     record.hypothesis = "test"
     record.scope = "scene"
     record.description = "Modified dialogue"
@@ -451,8 +451,8 @@ def test_round_result_from_experiment_record():
     record.status = "keep"
     record.score_before.total = 70
     record.score_after.total = 74
-    record.score_before.scores = {"结构": 18, "对白": 14}
-    record.score_after.scores = {"结构": 18, "对白": 18}
+    record.score_before.scores = {"缁撴瀯": 18, "瀵圭櫧": 14}
+    record.score_after.scores = {"缁撴瀯": 18, "瀵圭櫧": 18}
     record.score_before.max_total = 100
     record.score_after.max_total = 100
 
@@ -465,14 +465,14 @@ def test_round_result_from_experiment_record():
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd forge-studio && python -m pytest tests/test_plugin_protocol.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_plugin_protocol.py -v`
 Expected: FAIL (no module)
 
 - [ ] **Step 3: Implement**
 
 ```python
-# forge_studio/plugin_protocol.py
-"""Plugin protocol and shared data types for Forge Studio."""
+# dramalab_studio/plugin_protocol.py
+"""Plugin protocol and shared data types for DramaLab Studio."""
 
 from __future__ import annotations
 
@@ -526,8 +526,8 @@ class RoundResult:
         )
 
 
-class ForgePlugin(Protocol):
-    """Protocol that all Forge Studio plugins must implement."""
+class DramaLabPlugin(Protocol):
+    """Protocol that all DramaLab Studio plugins must implement."""
 
     name: str
     display_name: str
@@ -550,15 +550,15 @@ class ForgePlugin(Protocol):
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd forge-studio && python -m pytest tests/test_plugin_protocol.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_plugin_protocol.py -v`
 Expected: ALL PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd forge-studio
-git add forge_studio/plugin_protocol.py tests/test_plugin_protocol.py
-git commit -m "feat: add ForgePlugin protocol and RoundResult dataclass"
+cd dramalab-studio
+git add dramalab_studio/plugin_protocol.py tests/test_plugin_protocol.py
+git commit -m "feat: add DramaLabPlugin protocol and RoundResult dataclass"
 ```
 
 ---
@@ -566,10 +566,10 @@ git commit -m "feat: add ForgePlugin protocol and RoundResult dataclass"
 ### Task 5: Upload Route
 
 **Files:**
-- Create: `forge-studio/forge_studio/routes/__init__.py`
-- Create: `forge-studio/forge_studio/routes/upload.py`
-- Create: `forge-studio/tests/test_upload.py`
-- Create: `forge-studio/tests/conftest.py`
+- Create: `dramalab-studio/dramalab_studio/routes/__init__.py`
+- Create: `dramalab-studio/dramalab_studio/routes/upload.py`
+- Create: `dramalab-studio/tests/test_upload.py`
+- Create: `dramalab-studio/tests/conftest.py`
 
 - [ ] **Step 1: Write tests**
 
@@ -577,7 +577,7 @@ git commit -m "feat: add ForgePlugin protocol and RoundResult dataclass"
 # tests/conftest.py
 import pytest
 from httpx import AsyncClient, ASGITransport
-from forge_studio.server import create_app
+from dramalab_studio.server import create_app
 
 @pytest.fixture
 def app():
@@ -601,8 +601,8 @@ pytestmark = pytest.mark.asyncio
 async def test_upload_docx(client):
     """Upload a .docx file and get extracted text."""
     doc = Document()
-    doc.add_paragraph("第一集 死神来了")
-    doc.add_paragraph("场景一：殡仪馆")
+    doc.add_paragraph("绗竴闆?姝荤鏉ヤ簡")
+    doc.add_paragraph("鍦烘櫙涓€锛氭浠")
     buf = io.BytesIO()
     doc.save(buf)
     buf.seek(0)
@@ -613,7 +613,7 @@ async def test_upload_docx(client):
     )
     assert resp.status_code == 200
     data = resp.json()
-    assert "第一集 死神来了" in data["text"]
+    assert "绗竴闆?姝荤鏉ヤ簡" in data["text"]
     assert data["filename"] == "test.docx"
 
 async def test_upload_md(client):
@@ -637,20 +637,20 @@ async def test_upload_invalid_type(client):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd forge-studio && python -m pytest tests/test_upload.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_upload.py -v`
 Expected: FAIL (no server module)
 
 - [ ] **Step 3: Implement server + upload route**
 
 ```python
-# forge_studio/server.py
+# dramalab_studio/server.py
 """FastAPI application factory."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Forge Studio", version="0.1.0")
+    app = FastAPI(title="DramaLab Studio", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000"],
@@ -658,18 +658,18 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    from forge_studio.routes.upload import router as upload_router
+    from dramalab_studio.routes.upload import router as upload_router
     app.include_router(upload_router, prefix="/api")
 
     return app
 ```
 
 ```python
-# forge_studio/routes/__init__.py
+# dramalab_studio/routes/__init__.py
 ```
 
 ```python
-# forge_studio/routes/upload.py
+# dramalab_studio/routes/upload.py
 """File upload endpoint."""
 
 from __future__ import annotations
@@ -710,14 +710,14 @@ async def upload_file(file: UploadFile = File(...)):
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd forge-studio && python -m pytest tests/test_upload.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_upload.py -v`
 Expected: ALL PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd forge-studio
-git add forge_studio/server.py forge_studio/routes/ tests/conftest.py tests/test_upload.py
+cd dramalab-studio
+git add dramalab_studio/server.py dramalab_studio/routes/ tests/conftest.py tests/test_upload.py
 git commit -m "feat: add file upload endpoint with docx/md support"
 ```
 
@@ -726,9 +726,9 @@ git commit -m "feat: add file upload endpoint with docx/md support"
 ### Task 6: ScriptSmith Plugin
 
 **Files:**
-- Create: `forge-studio/forge_studio/plugins/__init__.py`
-- Create: `forge-studio/forge_studio/plugins/scriptsmith_plugin.py`
-- Create: `forge-studio/tests/test_scriptsmith_plugin.py`
+- Create: `dramalab-studio/dramalab_studio/plugins/__init__.py`
+- Create: `dramalab-studio/dramalab_studio/plugins/scriptsmith_plugin.py`
+- Create: `dramalab-studio/tests/test_scriptsmith_plugin.py`
 
 - [ ] **Step 1: Write tests**
 
@@ -737,24 +737,24 @@ git commit -m "feat: add file upload endpoint with docx/md support"
 import pytest
 import asyncio
 from unittest.mock import patch, MagicMock
-from forge_studio.plugins.scriptsmith_plugin import ScriptForgePlugin
+from dramalab_studio.plugins.scriptsmith_plugin import ScriptSmithPlugin
 
 pytestmark = pytest.mark.asyncio
 
 @pytest.fixture
 def plugin(tmp_path):
-    return ScriptForgePlugin(workdir=tmp_path)
+    return ScriptSmithPlugin(workdir=tmp_path)
 
 async def test_initialize_creates_workspace(plugin, tmp_path):
     """initialize() should create workspace with sequences."""
-    with patch("forge_studio.plugins.scriptsmith_plugin.split_screenplay") as mock_split, \
-         patch("forge_studio.plugins.scriptsmith_plugin.git_init"), \
-         patch("forge_studio.plugins.scriptsmith_plugin.derive_all"):
+    with patch("dramalab_studio.plugins.scriptsmith_plugin.split_screenplay") as mock_split, \
+         patch("dramalab_studio.plugins.scriptsmith_plugin.git_init"), \
+         patch("dramalab_studio.plugins.scriptsmith_plugin.derive_all"):
         mock_split.return_value = [
             MagicMock(id="seq_01", title="Ep 1", char_count=5000, scene_count=3, to_dict=lambda: {"id": "seq_01"})
         ]
         result = await plugin.initialize(
-            input_text="第一集\n场景一：殡仪馆",
+            input_text="绗竴闆哱n鍦烘櫙涓€锛氭浠",
             criteria_text="# Criteria\nStructure: 20",
             config={"model": "sonnet"},
         )
@@ -800,25 +800,25 @@ async def test_export_returns_bytes(plugin, tmp_path):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd forge-studio && python -m pytest tests/test_scriptsmith_plugin.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_scriptsmith_plugin.py -v`
 Expected: FAIL (no module)
 
 - [ ] **Step 3: Implement**
 
 ```python
-# forge_studio/plugins/__init__.py
+# dramalab_studio/plugins/__init__.py
 """Plugin registry."""
 
 from __future__ import annotations
 
-from forge_studio.plugin_protocol import ForgePlugin
+from dramalab_studio.plugin_protocol import DramaLabPlugin
 
-_registry: dict[str, ForgePlugin] = {}
+_registry: dict[str, DramaLabPlugin] = {}
 
-def register_plugin(plugin: ForgePlugin) -> None:
+def register_plugin(plugin: DramaLabPlugin) -> None:
     _registry[plugin.name] = plugin
 
-def get_plugin(name: str) -> ForgePlugin | None:
+def get_plugin(name: str) -> DramaLabPlugin | None:
     return _registry.get(name)
 
 def list_plugins() -> list[dict]:
@@ -826,8 +826,8 @@ def list_plugins() -> list[dict]:
 ```
 
 ```python
-# forge_studio/plugins/scriptsmith_plugin.py
-"""ScriptSmith plugin adapter for Forge Studio."""
+# dramalab_studio/plugins/scriptsmith_plugin.py
+"""ScriptSmith plugin adapter for DramaLab Studio."""
 
 from __future__ import annotations
 
@@ -840,17 +840,17 @@ import uuid
 from pathlib import Path
 from typing import AsyncIterator
 
-from forge_studio.plugin_protocol import ForgePlugin, RoundResult
+from dramalab_studio.plugin_protocol import DramaLabPlugin, RoundResult
 
 
-class ScriptForgePlugin:
-    """Wraps the scriptsmith package as a Forge Studio plugin."""
+class ScriptSmithPlugin:
+    """Wraps the scriptsmith package as a DramaLab Studio plugin."""
 
     name = "scriptsmith"
-    display_name = "剧本优化"
+    display_name = "鍓ф湰浼樺寲"
 
     def __init__(self, workdir: Path | None = None) -> None:
-        self._workdir = workdir or Path(tempfile.gettempdir()) / "forge-studio"
+        self._workdir = workdir or Path(tempfile.gettempdir()) / "dramalab-studio"
         self._workdir.mkdir(parents=True, exist_ok=True)
         self._workspace: Path | None = None
         self._session_id: str | None = None
@@ -886,7 +886,7 @@ class ScriptForgePlugin:
         # Write project config
         model = config.get("model", "sonnet")
         config_content = f"""[project]
-name = "forge-studio-session"
+name = "dramalab-studio-session"
 created = "{__import__('datetime').date.today().isoformat()}"
 
 [backend]
@@ -1027,14 +1027,14 @@ target_chars_max = 15000
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd forge-studio && python -m pytest tests/test_scriptsmith_plugin.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_scriptsmith_plugin.py -v`
 Expected: ALL PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd forge-studio
-git add forge_studio/plugins/ tests/test_scriptsmith_plugin.py
+cd dramalab-studio
+git add dramalab_studio/plugins/ tests/test_scriptsmith_plugin.py
 git commit -m "feat: add scriptsmith plugin adapter"
 ```
 
@@ -1043,10 +1043,10 @@ git commit -m "feat: add scriptsmith plugin adapter"
 ### Task 7: Plugin API Routes + SSE
 
 **Files:**
-- Create: `forge-studio/forge_studio/sse.py`
-- Create: `forge-studio/forge_studio/routes/plugins.py`
-- Modify: `forge-studio/forge_studio/server.py`
-- Create: `forge-studio/tests/test_routes.py`
+- Create: `dramalab-studio/dramalab_studio/sse.py`
+- Create: `dramalab-studio/dramalab_studio/routes/plugins.py`
+- Modify: `dramalab-studio/dramalab_studio/server.py`
+- Create: `dramalab-studio/tests/test_routes.py`
 
 - [ ] **Step 1: Write tests**
 
@@ -1066,7 +1066,7 @@ async def test_plugin_init(client):
         "sequences": [{"id": "seq_01"}],
     })
 
-    with patch("forge_studio.routes.plugins.get_plugin", return_value=mock_plugin):
+    with patch("dramalab_studio.routes.plugins.get_plugin", return_value=mock_plugin):
         resp = await client.post(
             "/api/plugins/scriptsmith/init",
             json={"input_text": "test", "criteria_text": "criteria", "config": {"model": "sonnet"}},
@@ -1084,8 +1084,8 @@ async def test_plugin_stop(client):
     mock_plugin = MagicMock()
     mock_plugin.stop = AsyncMock()
 
-    with patch("forge_studio.routes.plugins.get_plugin", return_value=mock_plugin), \
-         patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins.get_plugin", return_value=mock_plugin), \
+         patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.post("/api/plugins/scriptsmith/abc/stop")
     assert resp.status_code == 200
 
@@ -1094,17 +1094,17 @@ async def test_plugin_run_sse(client):
     mock_plugin = MagicMock()
 
     async def mock_run(config):
-        from forge_studio.plugin_protocol import RoundResult
+        from dramalab_studio.plugin_protocol import RoundResult
         yield RoundResult(
             round_number=1, status="keep", total_before=70, total_after=74,
-            delta=4, target_dimension="对白", description="test",
-            scores_before={"对白": 14}, scores_after={"对白": 18}, max_total=100,
+            delta=4, target_dimension="瀵圭櫧", description="test",
+            scores_before={"瀵圭櫧": 14}, scores_after={"瀵圭櫧": 18}, max_total=100,
         )
 
     mock_plugin.run = mock_run
     mock_plugin._worker = None
 
-    with patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.post("/api/plugins/scriptsmith/abc/run")
     assert resp.status_code == 200
     assert "text/event-stream" in resp.headers["content-type"]
@@ -1116,7 +1116,7 @@ async def test_plugin_text(client):
     mock_plugin = MagicMock()
     mock_plugin.get_current_text = AsyncMock(return_value="optimized text")
 
-    with patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.get("/api/plugins/scriptsmith/abc/text")
     assert resp.status_code == 200
     assert resp.json()["text"] == "optimized text"
@@ -1126,7 +1126,7 @@ async def test_plugin_export(client):
     mock_plugin = MagicMock()
     mock_plugin.export = AsyncMock(return_value=b"PK\x03\x04fake-docx")
 
-    with patch("forge_studio.routes.plugins._sessions", {"abc": mock_plugin}):
+    with patch("dramalab_studio.routes.plugins._sessions", {"abc": mock_plugin}):
         resp = await client.get("/api/plugins/scriptsmith/abc/export")
     assert resp.status_code == 200
     assert resp.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -1134,13 +1134,13 @@ async def test_plugin_export(client):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd forge-studio && python -m pytest tests/test_routes.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_routes.py -v`
 Expected: FAIL
 
 - [ ] **Step 3: Implement SSE helper**
 
 ```python
-# forge_studio/sse.py
+# dramalab_studio/sse.py
 """Server-Sent Events helper."""
 
 from __future__ import annotations
@@ -1180,7 +1180,7 @@ class EventSourceResponse(StreamingResponse):
 - [ ] **Step 4: Implement plugin routes**
 
 ```python
-# forge_studio/routes/plugins.py
+# dramalab_studio/routes/plugins.py
 """Plugin API routes."""
 
 from __future__ import annotations
@@ -1190,13 +1190,13 @@ import asyncio
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from forge_studio.plugins import get_plugin
-from forge_studio.sse import EventSourceResponse
+from dramalab_studio.plugins import get_plugin
+from dramalab_studio.sse import EventSourceResponse
 
 router = APIRouter()
 
 # In-memory session tracking (v1 single-user)
-_sessions: dict[str, object] = {}  # session_id → plugin instance
+_sessions: dict[str, object] = {}  # session_id 鈫?plugin instance
 
 
 class InitRequest(BaseModel):
@@ -1273,7 +1273,7 @@ async def plugin_status(name: str, session_id: str):
         from scriptsmith.state import load_state, load_history
         state = load_state(plugin._workspace)
         history = load_history(plugin._workspace)
-        from forge_studio.plugin_protocol import RoundResult
+        from dramalab_studio.plugin_protocol import RoundResult
         rounds = []
         for i, record in enumerate(history):
             rounds.append(RoundResult.from_experiment_record(record, round_number=i + 1).to_dict())
@@ -1306,13 +1306,13 @@ async def plugin_export(name: str, session_id: str):
 
 @router.get("/plugins/{name}/{session_id}/stream")
 async def plugin_stream(name: str, session_id: str):
-    """SSE endpoint for reconnection — replays all rounds from history."""
+    """SSE endpoint for reconnection 鈥?replays all rounds from history."""
     plugin = _get_session(name, session_id)
 
     async def event_generator():
         if hasattr(plugin, '_workspace') and plugin._workspace:
             from scriptsmith.state import load_history
-            from forge_studio.plugin_protocol import RoundResult
+            from dramalab_studio.plugin_protocol import RoundResult
             history = load_history(plugin._workspace)
             for i, record in enumerate(history):
                 yield "round", RoundResult.from_experiment_record(record, round_number=i + 1).to_dict()
@@ -1334,11 +1334,11 @@ async def plugin_delete(name: str, session_id: str):
 
 - [ ] **Step 5: Register plugin and routes in server.py**
 
-Update `forge_studio/server.py`:
+Update `dramalab_studio/server.py`:
 
 ```python
 def create_app() -> FastAPI:
-    app = FastAPI(title="Forge Studio", version="0.1.0")
+    app = FastAPI(title="DramaLab Studio", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000"],
@@ -1346,29 +1346,29 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    from forge_studio.routes.upload import router as upload_router
-    from forge_studio.routes.plugins import router as plugins_router
+    from dramalab_studio.routes.upload import router as upload_router
+    from dramalab_studio.routes.plugins import router as plugins_router
     app.include_router(upload_router, prefix="/api")
     app.include_router(plugins_router, prefix="/api")
 
     # Register plugins
-    from forge_studio.plugins import register_plugin
-    from forge_studio.plugins.scriptsmith_plugin import ScriptForgePlugin
-    register_plugin(ScriptForgePlugin())
+    from dramalab_studio.plugins import register_plugin
+    from dramalab_studio.plugins.scriptsmith_plugin import ScriptSmithPlugin
+    register_plugin(ScriptSmithPlugin())
 
     return app
 ```
 
 - [ ] **Step 6: Run tests**
 
-Run: `cd forge-studio && python -m pytest tests/ -v`
+Run: `cd dramalab-studio && python -m pytest tests/ -v`
 Expected: ALL PASS
 
 - [ ] **Step 7: Commit**
 
 ```bash
-cd forge-studio
-git add forge_studio/sse.py forge_studio/routes/plugins.py forge_studio/server.py tests/test_routes.py
+cd dramalab-studio
+git add dramalab_studio/sse.py dramalab_studio/routes/plugins.py dramalab_studio/server.py tests/test_routes.py
 git commit -m "feat: add plugin API routes with SSE streaming"
 ```
 
@@ -1377,15 +1377,15 @@ git commit -m "feat: add plugin API routes with SSE streaming"
 ### Task 8: CLI Entry Point
 
 **Files:**
-- Create: `forge-studio/forge_studio/cli.py`
-- Create: `forge-studio/tests/test_cli.py`
+- Create: `dramalab-studio/dramalab_studio/cli.py`
+- Create: `dramalab-studio/tests/test_cli.py`
 
 - [ ] **Step 1: Write test**
 
 ```python
 # tests/test_cli.py
 from typer.testing import CliRunner
-from forge_studio.cli import app
+from dramalab_studio.cli import app
 
 runner = CliRunner()
 
@@ -1393,7 +1393,7 @@ def test_help():
     """CLI should show help text."""
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    assert "forge-studio" in result.output.lower() or "Web UI" in result.output
+    assert "dramalab-studio" in result.output.lower() or "Web UI" in result.output
 
 def test_start_help():
     """start command should show help."""
@@ -1407,8 +1407,8 @@ def test_start_help():
 - [ ] **Step 2: Implement**
 
 ```python
-# forge_studio/cli.py
-"""CLI entry point for Forge Studio."""
+# dramalab_studio/cli.py
+"""CLI entry point for DramaLab Studio."""
 
 from __future__ import annotations
 
@@ -1419,7 +1419,7 @@ from pathlib import Path
 
 import typer
 
-app = typer.Typer(name="forge-studio", help="Web UI for creative-writing optimization tools.")
+app = typer.Typer(name="dramalab-studio", help="Web UI for creative-writing optimization tools.")
 
 
 @app.command()
@@ -1428,11 +1428,11 @@ def start(
     api_port: int = typer.Option(8000, "--api-port", help="Backend API port"),
     no_browser: bool = typer.Option(False, "--no-browser", help="Don't open browser"),
 ) -> None:
-    """Start Forge Studio (backend + frontend)."""
+    """Start DramaLab Studio (backend + frontend)."""
     import uvicorn
-    from forge_studio.server import create_app
+    from dramalab_studio.server import create_app
 
-    typer.echo(f"Starting Forge Studio...")
+    typer.echo(f"Starting DramaLab Studio...")
     typer.echo(f"  API: http://localhost:{api_port}")
     typer.echo(f"  UI:  http://localhost:{port}")
 
@@ -1452,15 +1452,15 @@ def main() -> None:
 
 - [ ] **Step 3: Run tests**
 
-Run: `cd forge-studio && python -m pytest tests/test_cli.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_cli.py -v`
 Expected: ALL PASS
 
 - [ ] **Step 4: Commit**
 
 ```bash
-cd forge-studio
-git add forge_studio/cli.py tests/test_cli.py
-git commit -m "feat: add forge-studio CLI entry point"
+cd dramalab-studio
+git add dramalab_studio/cli.py tests/test_cli.py
+git commit -m "feat: add dramalab-studio CLI entry point"
 ```
 
 ---
@@ -1470,19 +1470,19 @@ git commit -m "feat: add forge-studio CLI entry point"
 ### Task 9: Next.js Project Scaffolding
 
 **Files:**
-- Create: `forge-studio/frontend/` (via create-next-app)
+- Create: `dramalab-studio/frontend/` (via create-next-app)
 
 - [ ] **Step 1: Create Next.js project**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 npx create-next-app@latest frontend --typescript --tailwind --eslint --app --no-src-dir --import-alias "@/*"
 ```
 
 - [ ] **Step 2: Install dependencies**
 
 ```bash
-cd forge-studio/frontend
+cd dramalab-studio/frontend
 npm install recharts lucide-react class-variance-authority clsx tailwind-merge
 npx shadcn@latest init -d
 ```
@@ -1538,7 +1538,7 @@ module.exports = nextConfig;
 - [ ] **Step 5: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/
 git commit -m "feat: scaffold Next.js frontend with Tailwind dark theme"
 ```
@@ -1548,8 +1548,8 @@ git commit -m "feat: scaffold Next.js frontend with Tailwind dark theme"
 ### Task 10: TypeScript Types + API Client
 
 **Files:**
-- Create: `forge-studio/frontend/types/index.ts`
-- Create: `forge-studio/frontend/lib/api.ts`
+- Create: `dramalab-studio/frontend/types/index.ts`
+- Create: `dramalab-studio/frontend/lib/api.ts`
 
 - [ ] **Step 1: Define types**
 
@@ -1680,7 +1680,7 @@ export function getStreamUrl(name: string, sessionId: string): string {
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/types/ frontend/lib/
 git commit -m "feat: add TypeScript types and API client"
 ```
@@ -1690,8 +1690,8 @@ git commit -m "feat: add TypeScript types and API client"
 ### Task 11: SSE Hook + Plugin State Hook
 
 **Files:**
-- Create: `forge-studio/frontend/hooks/use-sse.ts`
-- Create: `forge-studio/frontend/hooks/use-plugin.ts`
+- Create: `dramalab-studio/frontend/hooks/use-sse.ts`
+- Create: `dramalab-studio/frontend/hooks/use-plugin.ts`
 
 - [ ] **Step 1: Implement SSE hook**
 
@@ -1927,18 +1927,18 @@ export function usePlugin(pluginName: string = 'scriptsmith') {
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/hooks/
 git commit -m "feat: add SSE hook and plugin state management"
 ```
 
 ---
 
-### Task 12: UI Components — TopBar + FileUpload
+### Task 12: UI Components 鈥?TopBar + FileUpload
 
 **Files:**
-- Create: `forge-studio/frontend/components/top-bar.tsx`
-- Create: `forge-studio/frontend/components/file-upload.tsx`
+- Create: `dramalab-studio/frontend/components/top-bar.tsx`
+- Create: `dramalab-studio/frontend/components/file-upload.tsx`
 
 - [ ] **Step 1: Implement TopBar**
 
@@ -1955,9 +1955,9 @@ interface TopBarProps {
 }
 
 const plugins = [
-  { name: '剧本优化', active: true },
-  { name: '分镜修改', active: false },
-  { name: '场景提示词', active: false },
+  { name: '鍓ф湰浼樺寲', active: true },
+  { name: '鍒嗛暅淇敼', active: false },
+  { name: '鍦烘櫙鎻愮ず璇?, active: false },
 ];
 
 export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
@@ -1965,7 +1965,7 @@ export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
     <div className="h-12 bg-[hsl(230,40%,8%)] border-b border-[hsl(230,20%,15%)] flex items-center px-5 gap-4">
       <div className="flex items-center gap-2 text-[hsl(var(--primary))] font-bold text-sm">
         <Hammer className="w-4 h-4" />
-        Forge Studio
+        DramaLab Studio
       </div>
       <div className="flex gap-1 ml-6">
         {plugins.map((p) => (
@@ -1986,7 +1986,7 @@ export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
       {status === 'running' && (
         <div className="flex items-center gap-2 text-xs text-yellow-400">
           <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-          Running · Round {currentRound}/{maxRounds}
+          Running 路 Round {currentRound}/{maxRounds}
         </div>
       )}
       {status === 'complete' && (
@@ -2073,18 +2073,18 @@ export function FileUpload({ accept, label, hint, onUpload, compact }: FileUploa
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/components/top-bar.tsx frontend/components/file-upload.tsx
 git commit -m "feat: add TopBar and FileUpload components"
 ```
 
 ---
 
-### Task 13: UI Components — InputPanel + ConfigPanel
+### Task 13: UI Components 鈥?InputPanel + ConfigPanel
 
 **Files:**
-- Create: `forge-studio/frontend/components/input-panel.tsx`
-- Create: `forge-studio/frontend/components/config-panel.tsx`
+- Create: `dramalab-studio/frontend/components/input-panel.tsx`
+- Create: `dramalab-studio/frontend/components/config-panel.tsx`
 
 - [ ] **Step 1: Implement InputPanel**
 
@@ -2104,15 +2104,15 @@ export function InputPanel({ text, onTextChange, onUpload }: InputPanelProps) {
   return (
     <div className="flex flex-col h-full border-r border-[hsl(230,20%,15%)]">
       <div className="px-4 py-3 bg-[hsl(230,40%,8%)] border-b border-[hsl(230,20%,15%)] text-xs font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">
-        📄 剧本输入
+        馃搫 鍓ф湰杈撳叆
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        <FileUpload accept=".docx" label="拖拽或点击上传 .docx" hint="支持 Word 文档" onUpload={onUpload} />
+        <FileUpload accept=".docx" label="鎷栨嫿鎴栫偣鍑讳笂浼?.docx" hint="鏀寔 Word 鏂囨。" onUpload={onUpload} />
         <textarea
           className="w-full h-[calc(100%-80px)] min-h-[200px] bg-[hsl(230,40%,6%)] border border-[hsl(230,20%,15%)] rounded-md p-3 text-sm text-[hsl(var(--foreground))] resize-none focus:outline-none focus:border-[hsl(var(--primary))] font-mono leading-relaxed"
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
-          placeholder="上传剧本后在此预览和编辑..."
+          placeholder="涓婁紶鍓ф湰鍚庡湪姝ら瑙堝拰缂栬緫..."
         />
       </div>
     </div>
@@ -2147,18 +2147,18 @@ export function ConfigPanel({
   return (
     <div className="flex flex-col h-full border-r border-[hsl(230,20%,15%)]">
       <div className="px-4 py-3 bg-[hsl(230,40%,8%)] border-b border-[hsl(230,20%,15%)] text-xs font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">
-        ⚙️ 配置
+        鈿欙笍 閰嶇疆
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Criteria */}
         <div>
-          <label className="text-[11px] text-[hsl(var(--muted-foreground))] font-medium">评分标准</label>
-          <FileUpload accept=".docx,.md" label="上传 .docx / .md" onUpload={onCriteriaUpload} compact />
+          <label className="text-[11px] text-[hsl(var(--muted-foreground))] font-medium">璇勫垎鏍囧噯</label>
+          <FileUpload accept=".docx,.md" label="涓婁紶 .docx / .md" onUpload={onCriteriaUpload} compact />
           <textarea
             className="w-full h-24 bg-[hsl(230,40%,6%)] border border-[hsl(230,20%,15%)] rounded-md p-2 text-[11px] text-[hsl(var(--foreground))] resize-none focus:outline-none focus:border-[hsl(var(--primary))] font-mono"
             value={criteriaText}
             onChange={(e) => onCriteriaChange(e.target.value)}
-            placeholder="评分标准..."
+            placeholder="璇勫垎鏍囧噯..."
           />
         </div>
 
@@ -2166,10 +2166,10 @@ export function ConfigPanel({
 
         {/* Config fields */}
         <div className="space-y-3">
-          <ConfigSelect label="模型" value={config.model} options={['sonnet', 'opus', 'haiku']} onChange={(v) => onConfigChange({ model: v })} />
-          <ConfigNumber label="轮数" value={config.rounds} min={1} max={100} onChange={(v) => onConfigChange({ rounds: v })} />
+          <ConfigSelect label="妯″瀷" value={config.model} options={['sonnet', 'opus', 'haiku']} onChange={(v) => onConfigChange({ model: v })} />
+          <ConfigNumber label="杞暟" value={config.rounds} min={1} max={100} onChange={(v) => onConfigChange({ rounds: v })} />
           <ConfigSelect label="Reasoning Effort" value={config.reasoning_effort} options={['low', 'medium', 'high']} onChange={(v) => onConfigChange({ reasoning_effort: v })} />
-          <ConfigSelect label="模式" value={config.mode} options={['auto', 'macro', 'micro']} onChange={(v) => onConfigChange({ mode: v })} />
+          <ConfigSelect label="妯″紡" value={config.mode} options={['auto', 'macro', 'micro']} onChange={(v) => onConfigChange({ mode: v })} />
           <ConfigNumber label="Keep Threshold" value={config.keep_threshold} min={1} max={10} onChange={(v) => onConfigChange({ keep_threshold: v })} />
         </div>
 
@@ -2181,7 +2181,7 @@ export function ConfigPanel({
           }`}
           onClick={isRunning ? onStop : onStart}
         >
-          {isRunning ? '⏹ STOP' : '▶ START'}
+          {isRunning ? '鈴?STOP' : '鈻?START'}
         </button>
       </div>
     </div>
@@ -2223,19 +2223,19 @@ function ConfigNumber({ label, value, min, max, onChange }: { label: string; val
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/components/input-panel.tsx frontend/components/config-panel.tsx
 git commit -m "feat: add InputPanel and ConfigPanel components"
 ```
 
 ---
 
-### Task 14: UI Components — ScoreCards + TrendChart + DimensionBars
+### Task 14: UI Components 鈥?ScoreCards + TrendChart + DimensionBars
 
 **Files:**
-- Create: `forge-studio/frontend/components/score-cards.tsx`
-- Create: `forge-studio/frontend/components/trend-chart.tsx`
-- Create: `forge-studio/frontend/components/dimension-bars.tsx`
+- Create: `dramalab-studio/frontend/components/score-cards.tsx`
+- Create: `dramalab-studio/frontend/components/trend-chart.tsx`
+- Create: `dramalab-studio/frontend/components/dimension-bars.tsx`
 
 - [ ] **Step 1: Implement ScoreCards**
 
@@ -2253,9 +2253,9 @@ interface ScoreCardsProps {
 export function ScoreCards({ currentScore, totalImprovement, currentRound, maxRounds }: ScoreCardsProps) {
   return (
     <div className="grid grid-cols-3 gap-2.5 mb-4">
-      <Card value={currentScore} label="当前总分" color="text-[hsl(var(--primary))]" />
-      <Card value={totalImprovement > 0 ? `+${totalImprovement}` : String(totalImprovement)} label="累计提升" color="text-yellow-400" />
-      <Card value={`${currentRound} / ${maxRounds}`} label="轮次" color="text-[hsl(var(--muted-foreground))]" />
+      <Card value={currentScore} label="褰撳墠鎬诲垎" color="text-[hsl(var(--primary))]" />
+      <Card value={totalImprovement > 0 ? `+${totalImprovement}` : String(totalImprovement)} label="绱鎻愬崌" color="text-yellow-400" />
+      <Card value={`${currentRound} / ${maxRounds}`} label="杞" color="text-[hsl(var(--muted-foreground))]" />
     </div>
   );
 }
@@ -2308,14 +2308,14 @@ export function TrendChart({ rounds, selectedRound, onSelectRound }: TrendChartP
   if (data.length === 0) {
     return (
       <div className="bg-[hsl(230,30%,10%)] border border-[hsl(230,20%,15%)] rounded-lg p-4 h-[180px] flex items-center justify-center">
-        <span className="text-xs text-[hsl(var(--muted-foreground))]">等待数据...</span>
+        <span className="text-xs text-[hsl(var(--muted-foreground))]">绛夊緟鏁版嵁...</span>
       </div>
     );
   }
 
   return (
     <div className="bg-[hsl(230,30%,10%)] border border-[hsl(230,20%,15%)] rounded-lg p-4">
-      <div className="text-xs text-[hsl(var(--muted-foreground))] mb-3">评分趋势</div>
+      <div className="text-xs text-[hsl(var(--muted-foreground))] mb-3">璇勫垎瓒嬪娍</div>
       <ResponsiveContainer width="100%" height={150}>
         <AreaChart data={data}>
           <defs>
@@ -2356,8 +2356,7 @@ export function DimensionBars({ round, baseline }: DimensionBarsProps) {
   if (!round) {
     return (
       <div className="flex items-center justify-center h-full text-xs text-[hsl(var(--muted-foreground))]">
-        点击图表数据点查看维度分数
-      </div>
+        鐐瑰嚮鍥捐〃鏁版嵁鐐规煡鐪嬬淮搴﹀垎鏁?      </div>
     );
   }
 
@@ -2372,7 +2371,7 @@ export function DimensionBars({ round, baseline }: DimensionBarsProps) {
   return (
     <div className="space-y-2">
       <div className="text-[10px] text-[hsl(var(--muted-foreground))]">
-        Round {round.round_number} 维度分数
+        Round {round.round_number} 缁村害鍒嗘暟
       </div>
       {dimensions.map((dim) => {
         const score = scores[dim];
@@ -2405,7 +2404,7 @@ export function DimensionBars({ round, baseline }: DimensionBarsProps) {
           </div>
         );
       })}
-      <div className="text-[8px] text-[hsl(230,20%,25%)]">虚线 = 初始分</div>
+      <div className="text-[8px] text-[hsl(230,20%,25%)]">铏氱嚎 = 鍒濆鍒?/div>
     </div>
   );
 }
@@ -2414,17 +2413,17 @@ export function DimensionBars({ round, baseline }: DimensionBarsProps) {
 - [ ] **Step 4: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/components/score-cards.tsx frontend/components/trend-chart.tsx frontend/components/dimension-bars.tsx
 git commit -m "feat: add ScoreCards, TrendChart, and DimensionBars components"
 ```
 
 ---
 
-### Task 15: UI Components — RoundTimeline
+### Task 15: UI Components 鈥?RoundTimeline
 
 **Files:**
-- Create: `forge-studio/frontend/components/round-timeline.tsx`
+- Create: `dramalab-studio/frontend/components/round-timeline.tsx`
 
 - [ ] **Step 1: Implement**
 
@@ -2446,14 +2445,14 @@ export function RoundTimeline({ rounds }: RoundTimelineProps) {
   if (reversed.length === 0) {
     return (
       <div className="text-xs text-[hsl(var(--muted-foreground))] text-center py-8">
-        尚无实验记录
+        灏氭棤瀹為獙璁板綍
       </div>
     );
   }
 
   return (
     <div className="space-y-2">
-      <div className="text-[11px] text-[hsl(230,20%,30%)] uppercase tracking-wider mb-2">轮次详情</div>
+      <div className="text-[11px] text-[hsl(230,20%,30%)] uppercase tracking-wider mb-2">杞璇︽儏</div>
       {reversed.map((round, i) => (
         <RoundCard key={round.round_number} round={round} />
       ))}
@@ -2504,7 +2503,7 @@ function RoundCard({ round }: { round: RoundResult }) {
               return (
                 <span key={dim} className="bg-[hsl(230,40%,6%)] border border-[hsl(230,20%,15%)] rounded px-2 py-0.5 text-[10px]">
                   {dim} {changed ? (
-                    <span className="text-[hsl(var(--primary))]">{before}→{score}</span>
+                    <span className="text-[hsl(var(--primary))]">{before}鈫抺score}</span>
                   ) : (
                     <span>{score}</span>
                   )}
@@ -2522,20 +2521,20 @@ function RoundCard({ round }: { round: RoundResult }) {
 - [ ] **Step 2: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/components/round-timeline.tsx
 git commit -m "feat: add RoundTimeline component"
 ```
 
 ---
 
-### Task 16: UI Components — ResultsPanel + Main Page Assembly
+### Task 16: UI Components 鈥?ResultsPanel + Main Page Assembly
 
 **Files:**
-- Create: `forge-studio/frontend/components/results-panel.tsx`
-- Modify: `forge-studio/frontend/app/layout.tsx`
-- Create: `forge-studio/frontend/app/scriptsmith/page.tsx`
-- Modify: `forge-studio/frontend/app/page.tsx`
+- Create: `dramalab-studio/frontend/components/results-panel.tsx`
+- Modify: `dramalab-studio/frontend/app/layout.tsx`
+- Create: `dramalab-studio/frontend/app/scriptsmith/page.tsx`
+- Modify: `dramalab-studio/frontend/app/page.tsx`
 
 - [ ] **Step 1: Implement ResultsPanel**
 
@@ -2570,7 +2569,7 @@ export function ResultsPanel({ rounds, baselineScores, selectedRound, onSelectRo
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 bg-[hsl(230,40%,8%)] border-b border-[hsl(230,20%,15%)] text-xs font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider flex items-center">
-        📊 结果
+        馃搳 缁撴灉
         <div className="flex-1" />
         {status === 'complete' && (
           <button onClick={onExport} className="flex items-center gap-1 text-[hsl(var(--primary))] hover:brightness-110">
@@ -2615,7 +2614,7 @@ import { ConfigPanel } from '@/components/config-panel';
 import { ResultsPanel } from '@/components/results-panel';
 import { usePlugin } from '@/hooks/use-plugin';
 
-export default function ScriptForgePage() {
+export default function ScriptSmithPage() {
   const { state, dispatch, handleUpload, handleStart, handleStop, handleExport } = usePlugin('scriptsmith');
 
   return (
@@ -2685,7 +2684,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Forge Studio',
+  title: 'DramaLab Studio',
   description: 'Web UI for creative-writing optimization tools',
 };
 
@@ -2700,37 +2699,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 - [ ] **Step 5: Verify frontend builds**
 
-Run: `cd forge-studio/frontend && npm run build`
+Run: `cd dramalab-studio/frontend && npm run build`
 Expected: Build succeeds with no errors. If there are TypeScript type errors (e.g., Recharts `Dot` props, `any` casts), fix them by adding explicit type annotations or `// @ts-expect-error` with explanation, then re-run build until clean.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add frontend/components/results-panel.tsx frontend/app/
 git commit -m "feat: assemble main page with 3-column layout"
 ```
 
 ---
 
-### Task 17: Integration Test — Full Flow
+### Task 17: Integration Test 鈥?Full Flow
 
 **Files:**
-- Create: `forge-studio/tests/test_integration.py`
+- Create: `dramalab-studio/tests/test_integration.py`
 
 - [ ] **Step 1: Write integration test**
 
 ```python
 # tests/test_integration.py
-"""Integration test: init → run 1 round → status → text → export."""
+"""Integration test: init 鈫?run 1 round 鈫?status 鈫?text 鈫?export."""
 
 import io
 import json
 import pytest
 from unittest.mock import patch, MagicMock
 from httpx import AsyncClient, ASGITransport
-from forge_studio.server import create_app
-from forge_studio.plugin_protocol import RoundResult
+from dramalab_studio.server import create_app
+from dramalab_studio.plugin_protocol import RoundResult
 
 pytestmark = pytest.mark.asyncio
 
@@ -2748,13 +2747,13 @@ async def client(app):
 
 
 async def test_full_flow(client, tmp_path):
-    """Test full flow: upload → init → status → export."""
+    """Test full flow: upload 鈫?init 鈫?status 鈫?export."""
     from docx import Document
 
     # Upload screenplay
     doc = Document()
-    doc.add_paragraph("第一集")
-    doc.add_paragraph("场景一")
+    doc.add_paragraph("绗竴闆?)
+    doc.add_paragraph("鍦烘櫙涓€")
     buf = io.BytesIO()
     doc.save(buf)
     buf.seek(0)
@@ -2764,10 +2763,10 @@ async def test_full_flow(client, tmp_path):
     text = resp.json()["text"]
 
     # Init plugin (with mocked backend to avoid needing Claude CLI)
-    with patch("forge_studio.plugins.scriptsmith_plugin.ClaudeCLIBackend") as MockBackend, \
-         patch("forge_studio.plugins.scriptsmith_plugin.split_screenplay") as mock_split, \
-         patch("forge_studio.plugins.scriptsmith_plugin.derive_all"), \
-         patch("forge_studio.plugins.scriptsmith_plugin.git_init"):
+    with patch("dramalab_studio.plugins.scriptsmith_plugin.ClaudeCLIBackend") as MockBackend, \
+         patch("dramalab_studio.plugins.scriptsmith_plugin.split_screenplay") as mock_split, \
+         patch("dramalab_studio.plugins.scriptsmith_plugin.derive_all"), \
+         patch("dramalab_studio.plugins.scriptsmith_plugin.git_init"):
 
         mock_split.return_value = [MagicMock(
             id="seq_01", filename="seq_01.md", title="Ep 1",
@@ -2791,23 +2790,23 @@ async def test_full_flow(client, tmp_path):
 
 - [ ] **Step 2: Run test**
 
-Run: `cd forge-studio && python -m pytest tests/test_integration.py -v`
+Run: `cd dramalab-studio && python -m pytest tests/test_integration.py -v`
 Expected: PASS
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add tests/test_integration.py
 git commit -m "test: add integration test for full flow"
 ```
 
 ---
 
-### Task 18: Final — .gitignore, LICENSE, README placeholder
+### Task 18: Final 鈥?.gitignore, LICENSE, README placeholder
 
 **Files:**
-- Create: `forge-studio/LICENSE`
+- Create: `dramalab-studio/LICENSE`
 
 - [ ] **Step 1: Add LICENSE**
 
@@ -2837,16 +2836,17 @@ SOFTWARE.
 
 - [ ] **Step 2: Run all tests**
 
-Run: `cd forge-studio && python -m pytest tests/ -v`
+Run: `cd dramalab-studio && python -m pytest tests/ -v`
 Expected: ALL PASS
 
-Run: `cd forge-studio/frontend && npm run build`
+Run: `cd dramalab-studio/frontend && npm run build`
 Expected: Build succeeds
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd forge-studio
+cd dramalab-studio
 git add LICENSE
 git commit -m "docs: add MIT license"
 ```
+

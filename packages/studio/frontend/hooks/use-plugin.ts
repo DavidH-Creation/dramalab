@@ -1,9 +1,11 @@
 'use client';
 
 import { useReducer, useCallback, useRef } from 'react';
+
 import type { PluginState, PluginConfig, RoundResult } from '@/types';
 import { DEFAULT_CONFIG } from '@/types';
 import { initPlugin, stopPlugin, uploadFile, exportDocx, getStreamUrl } from '@/lib/api';
+
 import { useSSE } from './use-sse';
 
 type Action =
@@ -40,7 +42,11 @@ function reducer(state: PluginState, action: Action): PluginState {
     case 'SET_CRITERIA':
       return { ...state, criteriaText: action.text };
     case 'SET_CONFIG':
-      return { ...state, config: { ...state.config, ...action.config }, maxRounds: action.config.rounds ?? state.maxRounds };
+      return {
+        ...state,
+        config: { ...state.config, ...action.config },
+        maxRounds: action.config.rounds ?? state.maxRounds,
+      };
     case 'SET_STATUS':
       return { ...state, status: action.status, errorMessage: null };
     case 'SET_SESSION':
@@ -69,7 +75,7 @@ function reducer(state: PluginState, action: Action): PluginState {
   }
 }
 
-export function usePlugin(pluginName: string = 'script-forge') {
+export function usePlugin(pluginName: string = 'scriptsmith') {
   const [state, dispatch] = useReducer(reducer, initialState);
   const streamUrlRef = useRef<string | null>(null);
 
@@ -91,7 +97,12 @@ export function usePlugin(pluginName: string = 'script-forge') {
     dispatch({ type: 'SET_STATUS', status: 'initializing' });
 
     try {
-      const result = await initPlugin(pluginName, state.inputText, state.criteriaText, state.config as unknown as Record<string, unknown>);
+      const result = await initPlugin(
+        pluginName,
+        state.inputText,
+        state.criteriaText,
+        state.config as unknown as Record<string, unknown>,
+      );
       dispatch({ type: 'SET_SESSION', sessionId: result.session_id });
       dispatch({ type: 'SET_STATUS', status: 'running' });
 

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "dramalab"
 version = "0.1.0"
-description = "DramaLab — LLM-driven creative writing optimization platform"
+description = "DramaLab - LLM-driven creative writing optimization platform"
 license = "MIT"
 requires-python = ">=3.11"
 

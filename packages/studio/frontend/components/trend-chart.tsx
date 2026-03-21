@@ -1,6 +1,7 @@
 'use client';
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 import type { RoundResult } from '@/types';
 
 interface TrendChartProps {
@@ -10,11 +11,11 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ rounds, selectedRound, onSelectRound }: TrendChartProps) {
-  const data = rounds.map((r, i) => ({
-    name: `R${r.round_number}`,
-    score: r.status === 'keep' ? r.total_after : r.total_before,
-    status: r.status,
-    index: i,
+  const data = rounds.map((round, index) => ({
+    name: `R${round.round_number}`,
+    score: round.status === 'keep' ? round.total_after : round.total_before,
+    status: round.status,
+    index,
   }));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,14 +35,14 @@ export function TrendChart({ rounds, selectedRound, onSelectRound }: TrendChartP
   if (data.length === 0) {
     return (
       <div className="bg-[hsl(230,30%,10%)] border border-[hsl(230,20%,15%)] rounded-lg p-4 h-[180px] flex items-center justify-center">
-        <span className="text-xs text-[hsl(var(--muted-foreground))]">等待数据...</span>
+        <span className="text-xs text-[hsl(var(--muted-foreground))]">Waiting for rounds...</span>
       </div>
     );
   }
 
   return (
     <div className="bg-[hsl(230,30%,10%)] border border-[hsl(230,20%,15%)] rounded-lg p-4">
-      <div className="text-xs text-[hsl(var(--muted-foreground))] mb-3">评分趋势</div>
+      <div className="text-xs text-[hsl(var(--muted-foreground))] mb-3">Score trend</div>
       <ResponsiveContainer width="100%" height={150}>
         <AreaChart data={data}>
           <defs>

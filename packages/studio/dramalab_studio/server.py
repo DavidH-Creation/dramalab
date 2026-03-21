@@ -19,7 +19,8 @@ def create_app() -> FastAPI:
 
     # Register plugins
     from dramalab_studio.plugins import register_plugin
-    from dramalab_studio.plugins.script_forge_plugin import ScriptForgePlugin
-    register_plugin(ScriptForgePlugin())
+    from dramalab_studio.plugins.scriptsmith_plugin import ScriptSmithPlugin
+
+    register_plugin(ScriptSmithPlugin())
 
     return app

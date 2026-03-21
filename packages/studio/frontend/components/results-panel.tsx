@@ -1,11 +1,13 @@
 'use client';
 
+import { Download } from 'lucide-react';
+
 import type { RoundResult } from '@/types';
+
 import { ScoreCards } from './score-cards';
 import { TrendChart } from './trend-chart';
 import { DimensionBars } from './dimension-bars';
 import { RoundTimeline } from './round-timeline';
-import { Download } from 'lucide-react';
 
 interface ResultsPanelProps {
   rounds: RoundResult[];
@@ -17,8 +19,16 @@ interface ResultsPanelProps {
   status: string;
 }
 
-export function ResultsPanel({ rounds, baselineScores, selectedRound, onSelectRound, maxRounds, onExport, status }: ResultsPanelProps) {
-  const lastKeep = [...rounds].reverse().find((r) => r.status === 'keep');
+export function ResultsPanel({
+  rounds,
+  baselineScores,
+  selectedRound,
+  onSelectRound,
+  maxRounds,
+  onExport,
+  status,
+}: ResultsPanelProps) {
+  const lastKeep = [...rounds].reverse().find((round) => round.status === 'keep');
   const currentScore = lastKeep ? lastKeep.total_after : (rounds[0]?.total_before ?? 0);
   const firstScore = rounds[0]?.total_before ?? 0;
   const improvement = currentScore - firstScore;
@@ -27,7 +37,7 @@ export function ResultsPanel({ rounds, baselineScores, selectedRound, onSelectRo
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 bg-[hsl(230,40%,8%)] border-b border-[hsl(230,20%,15%)] text-xs font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider flex items-center">
-        📊 结果
+        Results
         <div className="flex-1" />
         {status === 'complete' && (
           <button onClick={onExport} className="flex items-center gap-1 text-[hsl(var(--primary))] hover:brightness-110">

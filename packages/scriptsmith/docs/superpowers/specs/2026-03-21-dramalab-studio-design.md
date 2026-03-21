@@ -1,28 +1,28 @@
-# Forge Studio — Web UI Design Spec
+﻿# DramaLab Studio 鈥?Web UI Design Spec
 
 **Date:** 2026-03-21
 **Status:** Draft
-**Scope:** v1 — local single-user, architecture ready for future multi-user/cloud
+**Scope:** v1 鈥?local single-user, architecture ready for future multi-user/cloud
 
 ---
 
 ## 1. Overview
 
-Forge Studio is a unified web application that hosts multiple creative-writing optimization tools. Each tool follows the same pattern: **left input → center config/criteria → right results**. v1 ships the "Script Forge" plugin (screenplay optimization). Future plugins: Storyboard Revision, Scene/Character Prompt Generation.
+DramaLab Studio is a unified web application that hosts multiple creative-writing optimization tools. Each tool follows the same pattern: **left input 鈫?center config/criteria 鈫?right results**. v1 ships the "ScriptSmith" plugin (screenplay optimization). Future plugins: Storyboard Revision, Scene/Character Prompt Generation.
 
 ### Architecture
 
 ```
-forge-studio/
-├── frontend/           # Next.js app (React, TypeScript, shadcn/ui)
-├── server/             # FastAPI gateway
-└── plugins/
-    └── scriptsmith/   # Adapter to existing scriptsmith Python package
+dramalab-studio/
+鈹溾攢鈹€ frontend/           # Next.js app (React, TypeScript, shadcn/ui)
+鈹溾攢鈹€ server/             # FastAPI gateway
+鈹斺攢鈹€ plugins/
+    鈹斺攢鈹€ scriptsmith/   # Adapter to existing scriptsmith Python package
 ```
 
-- **frontend/** — Next.js 14+ (App Router), TypeScript, Tailwind CSS, shadcn/ui, Recharts for charts
-- **server/** — FastAPI, serves REST API, manages plugin lifecycle, streams round results via SSE
-- **plugins/** — Each plugin is a Python module conforming to a `ForgePlugin` protocol
+- **frontend/** 鈥?Next.js 14+ (App Router), TypeScript, Tailwind CSS, shadcn/ui, Recharts for charts
+- **server/** 鈥?FastAPI, serves REST API, manages plugin lifecycle, streams round results via SSE
+- **plugins/** 鈥?Each plugin is a Python module conforming to a `DramaLabPlugin` protocol
 
 ### Key Decisions
 
@@ -34,7 +34,7 @@ forge-studio/
 | Chart library | Recharts | React-native, SVG-based, supports click interactions |
 | Layout | Fixed 3-column | All info visible simultaneously, fits the workflow |
 | Communication | REST + SSE | REST for CRUD, SSE for streaming round results |
-| v1 deployment | Local only | `forge-studio start` launches both server + frontend |
+| v1 deployment | Local only | `dramalab-studio start` launches both server + frontend |
 
 ---
 
@@ -44,18 +44,18 @@ forge-studio/
 
 | Element | Position | Behavior |
 |---|---|---|
-| Logo "Forge Studio" | Left | Static |
-| Plugin tabs | Left, after logo | "剧本优化" (active), "分镜修改", "场景提示词" (greyed if no plugin) |
-| Status indicator | Right | Idle / "Running · Round 5/10" with pulsing dot |
+| Logo "DramaLab Studio" | Left | Static |
+| Plugin tabs | Left, after logo | "鍓ф湰浼樺寲" (active), "鍒嗛暅淇敼", "鍦烘櫙鎻愮ず璇? (greyed if no plugin) |
+| Status indicator | Right | Idle / "Running 路 Round 5/10" with pulsing dot |
 
-### 2.2 Left Panel — Input (30% width)
+### 2.2 Left Panel 鈥?Input (30% width)
 
-- **File upload zone** — Drag-and-drop or click to upload `.docx` file
-- **File badge** — Shows filename, size, remove button after upload
-- **Textarea** — Editable text preview of the uploaded screenplay. Backend parses docx → text on upload, user can edit before running. This is the canonical input.
+- **File upload zone** 鈥?Drag-and-drop or click to upload `.docx` file
+- **File badge** 鈥?Shows filename, size, remove button after upload
+- **Textarea** 鈥?Editable text preview of the uploaded screenplay. Backend parses docx 鈫?text on upload, user can edit before running. This is the canonical input.
 - **Behavior:** Upload replaces textarea content. Manual edits are preserved until next upload.
 
-### 2.3 Center Panel — Config (22% width)
+### 2.3 Center Panel 鈥?Config (22% width)
 
 **Top section: Criteria**
 - Upload zone for `.docx` / `.md` criteria file (smaller)
@@ -68,21 +68,21 @@ forge-studio/
 | Parameter | Control | Default | Options |
 |---|---|---|---|
 | Model | Dropdown | Sonnet | Sonnet, Opus, Haiku |
-| Rounds | Number input | 10 | 1–100 |
+| Rounds | Number input | 10 | 1鈥?00 |
 | Reasoning Effort | Dropdown | Medium | Low, Medium, High (passed as `--reasoning-effort` flag to `claude -p`) |
 | Mode | Dropdown | Auto | Auto, Macro, Micro |
-| Keep Threshold | Number input | 1 | 1–10 (passed to `run_loop` via new `keep_threshold` parameter; min 1 to preserve stall detection semantics) |
+| Keep Threshold | Number input | 1 | 1鈥?0 (passed to `run_loop` via new `keep_threshold` parameter; min 1 to preserve stall detection semantics) |
 
-**Start/Stop button** — Full-width, green "▶ START" / red "⏹ STOP" toggle
+**Start/Stop button** 鈥?Full-width, green "鈻?START" / red "鈴?STOP" toggle
 
-### 2.4 Right Panel — Results (48% width)
+### 2.4 Right Panel 鈥?Results (48% width)
 
 #### 2.4.1 Score Summary Cards (top)
 
 Three metric cards in a row:
-- **当前总分** — Large number, green
-- **累计提升** — Delta from baseline, yellow with +/- sign
-- **轮次** — "Current / Max", blue
+- **褰撳墠鎬诲垎** 鈥?Large number, green
+- **绱鎻愬崌** 鈥?Delta from baseline, yellow with +/- sign
+- **杞** 鈥?"Current / Max", blue
 
 #### 2.4.2 Trend Chart (middle)
 
@@ -101,7 +101,7 @@ Three metric cards in a row:
 - Bar fill shows current score, dashed vertical line shows initial (baseline) score
 - Color: green if improved from baseline, yellow if weakest dimension
 - Label: dimension name (left), score "N/M" (right)
-- Header: "Round N 维度分数" (updates on point click)
+- Header: "Round N 缁村害鍒嗘暟" (updates on point click)
 - Default: shows latest completed round
 
 #### 2.4.3 Round Timeline (bottom, scrollable)
@@ -114,13 +114,13 @@ Vertical list of round cards, newest first:
 
 **Round card (expanded, on click):**
 - Description of what was modified and why
-- Dimension score tags showing before→after for changed dimensions
+- Dimension score tags showing before鈫抋fter for changed dimensions
 
 ---
 
 ## 3. Plugin Architecture
 
-### 3.1 ForgePlugin Protocol
+### 3.1 DramaLabPlugin Protocol
 
 ```python
 from typing import Protocol, AsyncIterator
@@ -134,13 +134,13 @@ class RoundResult:
     delta: int
     target_dimension: str
     description: str
-    scores_before: dict[str, int]  # dimension → score
-    scores_after: dict[str, int]   # dimension → score
+    scores_before: dict[str, int]  # dimension 鈫?score
+    scores_after: dict[str, int]   # dimension 鈫?score
     max_total: int                 # Sum of all dimension max scores (same for before/after)
 
-class ForgePlugin(Protocol):
+class DramaLabPlugin(Protocol):
     name: str            # e.g. "scriptsmith"
-    display_name: str    # e.g. "剧本优化"
+    display_name: str    # e.g. "鍓ф湰浼樺寲"
 
     async def initialize(self, input_text: str, criteria_text: str, config: dict) -> dict:
         """Set up workspace, return initial state (e.g. sequence info)."""
@@ -171,23 +171,23 @@ The v1 plugin wraps the existing `scriptsmith` Python package.
 
 The plugin adapter requires these targeted changes to the existing `scriptsmith` package:
 
-1. **`ClaudeCLIBackend` — add `reasoning_effort` parameter:**
+1. **`ClaudeCLIBackend` 鈥?add `reasoning_effort` parameter:**
    - Constructor: `def __init__(self, model, timeout, reasoning_effort="medium")`
    - `query()`: append `--reasoning-effort {self.reasoning_effort}` to the `claude -p` command
 
-2. **`run_loop` — add `keep_threshold` parameter and `on_round` callback:**
+2. **`run_loop` 鈥?add `keep_threshold` parameter and `on_round` callback:**
    - Signature: `def run_loop(workspace, mode, rounds, backend, sequence=None, keep_threshold=1, on_round=None, stop_event=None)`
    - Replace hardcoded `delta >= 1` with `delta >= keep_threshold`
    - After each round's `ExperimentRecord` is created, call `on_round(record)` if provided
    - Check `stop_event.is_set()` at the top of each iteration to support graceful cancellation
 
-3. **No other changes** — all existing CLI behavior, models, and tests remain unchanged.
+3. **No other changes** 鈥?all existing CLI behavior, models, and tests remain unchanged.
 
 #### 3.2.2 Plugin Methods
 
-- **`initialize()`** — Full workspace setup sequence:
+- **`initialize()`** 鈥?Full workspace setup sequence:
   1. Create workspace directory + subdirs (`input/`, `sequences/`, `derived/`, `experiments/`, `exports/`, `.scriptsmith/`)
-  2. Write input text to a temp `.docx` file via `python-docx` (one paragraph per line — `split_screenplay()` requires a real `.docx`)
+  2. Write input text to a temp `.docx` file via `python-docx` (one paragraph per line 鈥?`split_screenplay()` requires a real `.docx`)
   3. Copy criteria text to `criteria.md`
   4. Generate `project.toml` config
   5. Create `.gitignore`
@@ -196,19 +196,19 @@ The plugin adapter requires these targeted changes to the existing `scriptsmith`
   8. Run `git_init()` to set up git tracking
   9. Return `{session_id, sequences: [...]}`
 
-- **`run()`** — Runs optimization in a background thread:
-  1. Acquire workspace lock via `acquire_lock(workspace)` (if already locked, raise → API returns 409)
+- **`run()`** 鈥?Runs optimization in a background thread:
+  1. Acquire workspace lock via `acquire_lock(workspace)` (if already locked, raise 鈫?API returns 409)
   2. Create `threading.Event` as `stop_event`
   3. Create `queue.Queue` (thread-safe) as result channel
-  4. Define `on_round(record: ExperimentRecord)` callback that converts `ExperimentRecord` → `RoundResult` and puts it on the queue. Callback is invoked **after** keep/discard side effects and history persistence complete, so SSE and `/status` stay consistent.
+  4. Define `on_round(record: ExperimentRecord)` callback that converts `ExperimentRecord` 鈫?`RoundResult` and puts it on the queue. Callback is invoked **after** keep/discard side effects and history persistence complete, so SSE and `/status` stay consistent.
   5. Spawn `threading.Thread` calling `run_loop(workspace, ..., on_round=on_round, stop_event=stop_event, keep_threshold=config["keep_threshold"])` wrapped in `try/finally` that releases the lock and puts a `None` sentinel on the queue
   6. Async bridge: poll `queue.Queue` via `asyncio.get_event_loop().run_in_executor()`, yield `RoundResult` objects until `None` sentinel
 
-- **`stop()`** — Sets `stop_event`, which `run_loop` checks at the top of each iteration. The loop finishes the current round (no mid-round cancellation), then exits. Lock is released by the `finally` block in the worker thread.
+- **`stop()`** 鈥?Sets `stop_event`, which `run_loop` checks at the top of each iteration. The loop finishes the current round (no mid-round cancellation), then exits. Lock is released by the `finally` block in the worker thread.
 
-- **`get_current_text()`** — On-demand read: loads manifest, concatenates all `sequences/*.md` in order. Not called during run (live left-panel updates are v2). Used for: initial display after init, and final text after run completes.
+- **`get_current_text()`** 鈥?On-demand read: loads manifest, concatenates all `sequences/*.md` in order. Not called during run (live left-panel updates are v2). Used for: initial display after init, and final text after run completes.
 
-- **`export()`** — Calls `export_to_docx()`, reads the output file, returns bytes
+- **`export()`** 鈥?Calls `export_to_docx()`, reads the output file, returns bytes
 
 ---
 
@@ -219,14 +219,14 @@ The plugin adapter requires these targeted changes to the existing `scriptsmith`
 v1 allows one active session per plugin at a time. Session ID is returned by `init` and required on all subsequent calls.
 
 ```
-POST   /api/plugins/{name}/init                — Upload input + criteria text, get session ID
-POST   /api/plugins/{name}/{session_id}/run    — Start optimization (returns immediately)
-POST   /api/plugins/{name}/{session_id}/stop   — Stop running loop
-GET    /api/plugins/{name}/{session_id}/status  — Get current state (full rounds history)
-GET    /api/plugins/{name}/{session_id}/text    — Get current optimized text
-GET    /api/plugins/{name}/{session_id}/export  — Download result docx
-GET    /api/plugins/{name}/{session_id}/stream  — SSE stream of round results
-DELETE /api/plugins/{name}/{session_id}         — Clean up workspace
+POST   /api/plugins/{name}/init                鈥?Upload input + criteria text, get session ID
+POST   /api/plugins/{name}/{session_id}/run    鈥?Start optimization (returns immediately)
+POST   /api/plugins/{name}/{session_id}/stop   鈥?Stop running loop
+GET    /api/plugins/{name}/{session_id}/status  鈥?Get current state (full rounds history)
+GET    /api/plugins/{name}/{session_id}/text    鈥?Get current optimized text
+GET    /api/plugins/{name}/{session_id}/export  鈥?Download result docx
+GET    /api/plugins/{name}/{session_id}/stream  鈥?SSE stream of round results
+DELETE /api/plugins/{name}/{session_id}         鈥?Clean up workspace
 ```
 
 If a session is already active and `init` is called again, return 409 Conflict.
@@ -235,7 +235,7 @@ If a session is already active and `init` is called again, return 409 Conflict.
 
 ```
 event: round
-data: {"round_number": 5, "status": "keep", "total_before": 74, "total_after": 78, "delta": 4, "target_dimension": "对白质量", "description": "...", "scores_before": {...}, "scores_after": {...}, "max_total": 100}
+data: {"round_number": 5, "status": "keep", "total_before": 74, "total_after": 78, "delta": 4, "target_dimension": "瀵圭櫧璐ㄩ噺", "description": "...", "scores_before": {...}, "scores_after": {...}, "max_total": 100}
 
 event: complete
 data: {"total_rounds": 10, "final_score": 82, "total_improvement": 16}
@@ -246,10 +246,10 @@ data: {"message": "Claude CLI not found", "round": 6}
 
 ### 4.3 File Upload
 
-`POST /api/upload` — Multipart form upload. Accepts `.docx` (extracts text via python-docx) and `.md`/`.txt` (reads as-is). Returns extracted text.
+`POST /api/upload` 鈥?Multipart form upload. Accepts `.docx` (extracts text via python-docx) and `.md`/`.txt` (reads as-is). Returns extracted text.
 
 ```json
-{"text": "第一集 死神来了\n\n场景一：殡仪馆 · 夜\n...", "filename": "screenplay.docx", "size_kb": 156}
+{"text": "绗竴闆?姝荤鏉ヤ簡\n\n鍦烘櫙涓€锛氭浠 路 澶淺n...", "filename": "screenplay.docx", "size_kb": 156}
 ```
 
 ---
@@ -258,27 +258,27 @@ data: {"message": "Claude CLI not found", "round": 6}
 
 ```
 frontend/
-├── app/
-│   ├── layout.tsx              # Root layout with TopBar
-│   ├── page.tsx                # Redirect to default plugin
-│   └── [plugin]/
-│       └── page.tsx            # Plugin workspace page
-├── components/
-│   ├── top-bar.tsx             # Logo + plugin tabs + status
-│   ├── input-panel.tsx         # Left: upload + textarea
-│   ├── config-panel.tsx        # Center: criteria + params + start/stop
-│   ├── results-panel.tsx       # Right: scores + chart + timeline
-│   ├── score-cards.tsx         # Three metric cards
-│   ├── trend-chart.tsx         # Recharts area chart + dimension bars
-│   ├── round-timeline.tsx      # Round card list
-│   └── file-upload.tsx         # Drag-and-drop upload zone
-├── hooks/
-│   ├── use-sse.ts              # SSE connection hook
-│   └── use-plugin.ts           # Plugin state management
-├── lib/
-│   └── api.ts                  # API client functions
-└── types/
-    └── index.ts                # Shared TypeScript types
+鈹溾攢鈹€ app/
+鈹?  鈹溾攢鈹€ layout.tsx              # Root layout with TopBar
+鈹?  鈹溾攢鈹€ page.tsx                # Redirect to default plugin
+鈹?  鈹斺攢鈹€ [plugin]/
+鈹?      鈹斺攢鈹€ page.tsx            # Plugin workspace page
+鈹溾攢鈹€ components/
+鈹?  鈹溾攢鈹€ top-bar.tsx             # Logo + plugin tabs + status
+鈹?  鈹溾攢鈹€ input-panel.tsx         # Left: upload + textarea
+鈹?  鈹溾攢鈹€ config-panel.tsx        # Center: criteria + params + start/stop
+鈹?  鈹溾攢鈹€ results-panel.tsx       # Right: scores + chart + timeline
+鈹?  鈹溾攢鈹€ score-cards.tsx         # Three metric cards
+鈹?  鈹溾攢鈹€ trend-chart.tsx         # Recharts area chart + dimension bars
+鈹?  鈹溾攢鈹€ round-timeline.tsx      # Round card list
+鈹?  鈹斺攢鈹€ file-upload.tsx         # Drag-and-drop upload zone
+鈹溾攢鈹€ hooks/
+鈹?  鈹溾攢鈹€ use-sse.ts              # SSE connection hook
+鈹?  鈹斺攢鈹€ use-plugin.ts           # Plugin state management
+鈹溾攢鈹€ lib/
+鈹?  鈹斺攢鈹€ api.ts                  # API client functions
+鈹斺攢鈹€ types/
+    鈹斺攢鈹€ index.ts                # Shared TypeScript types
 ```
 
 ### State Management
@@ -305,26 +305,26 @@ interface PluginState {
 
 ```
 User uploads .docx
-  → POST /api/upload → returns text
-  → Frontend displays text in left panel textarea
+  鈫?POST /api/upload 鈫?returns text
+  鈫?Frontend displays text in left panel textarea
 
 User edits criteria + sets config, clicks START
-  → POST /api/plugins/scriptsmith/init {input_text, criteria_text, config}
-  → Returns {session_id, sequences: [...]}
-  → POST /api/plugins/scriptsmith/{session_id}/run
-  → Frontend connects to GET /api/plugins/scriptsmith/{session_id}/stream
+  鈫?POST /api/plugins/scriptsmith/init {input_text, criteria_text, config}
+  鈫?Returns {session_id, sequences: [...]}
+  鈫?POST /api/plugins/scriptsmith/{session_id}/run
+  鈫?Frontend connects to GET /api/plugins/scriptsmith/{session_id}/stream
 
 Each round completes
-  → SSE event: round result
-  → Frontend appends to rounds[], updates chart + timeline + score cards
-  → If user clicks a chart data point → selectedRound updates → dimension bars re-render
+  鈫?SSE event: round result
+  鈫?Frontend appends to rounds[], updates chart + timeline + score cards
+  鈫?If user clicks a chart data point 鈫?selectedRound updates 鈫?dimension bars re-render
 
 User clicks STOP
-  → POST /api/plugins/scriptsmith/{session_id}/stop
-  → SSE event: complete
+  鈫?POST /api/plugins/scriptsmith/{session_id}/stop
+  鈫?SSE event: complete
 
 User clicks Export
-  → GET /api/plugins/scriptsmith/{session_id}/export → downloads .docx
+  鈫?GET /api/plugins/scriptsmith/{session_id}/export 鈫?downloads .docx
 ```
 
 ---
@@ -334,7 +334,7 @@ User clicks Export
 v1 is local-only. Single command to start everything:
 
 ```bash
-forge-studio start [--port 3000]
+dramalab-studio start [--port 3000]
 ```
 
 This:
@@ -342,7 +342,7 @@ This:
 2. Starts Next.js dev server on port 3000
 3. Opens browser to `http://localhost:3000`
 
-For production build: `forge-studio build` bundles Next.js static export, FastAPI serves it directly from a single port.
+For production build: `dramalab-studio build` bundles Next.js static export, FastAPI serves it directly from a single port.
 
 ---
 
@@ -351,7 +351,7 @@ For production build: `forge-studio build` bundles Next.js static export, FastAP
 ```toml
 # pyproject.toml (root)
 [project]
-name = "forge-studio"
+name = "dramalab-studio"
 dependencies = [
     "fastapi>=0.110",
     "uvicorn>=0.29",
@@ -360,11 +360,11 @@ dependencies = [
 ]
 
 [project.scripts]
-forge-studio = "forge_studio.cli:app"
+dramalab-studio = "dramalab_studio.cli:app"
 ```
 
 ```json
-// frontend/package.json (illustrative — exact versions resolved by create-next-app + shadcn init)
+// frontend/package.json (illustrative 鈥?exact versions resolved by create-next-app + shadcn init)
 {
   "dependencies": {
     "next": "^14",
@@ -388,7 +388,7 @@ Note: shadcn/ui components are copied into the project (not npm packages). Radix
 - File upload + textarea editing for input and criteria
 - 5 config parameters (model, rounds, reasoning effort, mode, keep threshold)
 - Real-time SSE streaming of round results
-- Interactive trend chart (click point → dimension breakdown)
+- Interactive trend chart (click point 鈫?dimension breakdown)
 - Expandable round timeline
 - Export to docx
 - Local-only, single user
@@ -398,7 +398,7 @@ Note: shadcn/ui components are copied into the project (not npm packages). Radix
 - Multi-user auth / login
 - Cloud deployment
 - Database (state lives in scriptsmith workspace on disk)
-- Live left-panel text update during run (v2 — show modified sequences in real-time)
+- Live left-panel text update during run (v2 鈥?show modified sequences in real-time)
 - Undo/redo for text edits
 - Dark/light theme toggle (dark only for v1)
 - Internationalization
@@ -410,12 +410,12 @@ Note: shadcn/ui components are copied into the project (not npm packages). Radix
 
 ### Backend
 - Unit tests: Plugin protocol compliance, API endpoint responses, SSE event format
-- Integration test: Full init → run 1 round → stop → export flow with MockBackend
+- Integration test: Full init 鈫?run 1 round 鈫?stop 鈫?export flow with MockBackend
 
 ### Frontend
 - Component tests: Each panel renders correctly with mock data
 - Hook tests: `use-sse` correctly parses SSE events, reconnects on error
-- E2E (Playwright): Upload file → configure → start → wait for 1 round result → verify chart updates → stop → export
+- E2E (Playwright): Upload file 鈫?configure 鈫?start 鈫?wait for 1 round result 鈫?verify chart updates 鈫?stop 鈫?export
 
 ---
 
@@ -428,3 +428,4 @@ Note: shadcn/ui components are copied into the project (not npm packages). Radix
 | Backend crash mid-round | SSE connection drops, frontend shows "Connection lost, retrying..." with auto-reconnect. On reconnect: fetch `GET /status` to get full state (including all past rounds), then resubscribe to SSE stream. SSE does not replay missed events. |
 | Score parsing failure | Round marked as "error" status, timeline shows error card, loop continues |
 | Workspace lock conflict | API returns 409 Conflict, frontend shows "Another session is running" |
+

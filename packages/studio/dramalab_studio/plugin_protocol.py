@@ -37,7 +37,7 @@ class RoundResult:
 
     @classmethod
     def from_experiment_record(cls, record, round_number: int) -> RoundResult:
-        """Convert a script_forge ExperimentRecord to RoundResult."""
+        """Convert a ScriptSmith experiment record to RoundResult."""
         return cls(
             round_number=round_number,
             status=record.status,

@@ -6,8 +6,8 @@ import { ConfigPanel } from '@/components/config-panel';
 import { ResultsPanel } from '@/components/results-panel';
 import { usePlugin } from '@/hooks/use-plugin';
 
-export default function ScriptForgePage() {
-  const { state, dispatch, handleUpload, handleStart, handleStop, handleExport } = usePlugin('script-forge');
+export default function ScriptSmithPage() {
+  const { state, dispatch, handleUpload, handleStart, handleStop, handleExport } = usePlugin('scriptsmith');
 
   return (
     <div className="h-screen flex flex-col">

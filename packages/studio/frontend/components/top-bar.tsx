@@ -9,9 +9,9 @@ interface TopBarProps {
 }
 
 const plugins = [
-  { name: '剧本优化', active: true },
-  { name: '分镜修改', active: false },
-  { name: '场景提示词', active: false },
+  { name: 'ScriptSmith', active: true },
+  { name: 'Storyboard', active: false },
+  { name: 'Prompt Lab', active: false },
 ];
 
 export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
@@ -22,17 +22,17 @@ export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
         DramaLab
       </div>
       <div className="flex gap-1 ml-6">
-        {plugins.map((p) => (
+        {plugins.map((plugin) => (
           <button
-            key={p.name}
+            key={plugin.name}
             className={`px-3 py-1.5 rounded-md text-xs ${
-              p.active
+              plugin.active
                 ? 'bg-[hsl(230,20%,15%)] text-[hsl(var(--primary))]'
                 : 'text-[hsl(var(--muted-foreground))] opacity-40 cursor-not-allowed'
             }`}
-            disabled={!p.active}
+            disabled={!plugin.active}
           >
-            {p.name}
+            {plugin.name}
           </button>
         ))}
       </div>
@@ -40,7 +40,7 @@ export function TopBar({ status, currentRound, maxRounds }: TopBarProps) {
       {status === 'running' && (
         <div className="flex items-center gap-2 text-xs text-yellow-400">
           <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-          Running · Round {currentRound}/{maxRounds}
+          Running | Round {currentRound}/{maxRounds}
         </div>
       )}
       {status === 'complete' && (
